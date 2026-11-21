@@ -31,6 +31,7 @@ from reference.native_sdpa_cmve import native_sdpa_cmve
 from kernels.native import flashcf_native
 from kernels.triton_native_qtile import flashcf_gemm_all
 from kernels.hybrid_flash_factual import hybrid_flash_factual
+from kernels.triton_cmve_delta import flashcf_factual_plus_delta
 from experiments.p0_capture_native_qwen import DEFAULT_MODEL,spans_from_ids,REV
 
 
@@ -80,6 +81,9 @@ def forward_with_patch(model,x,spans,layer,variant):
         elif variant=="hybrid":
             result=hybrid_flash_factual(q,k,v,spans,attention_mask,
                                        thres_mode="high",mean_mode="image")
+        elif variant=="direct":
+            result=flashcf_factual_plus_delta(q,k,v,spans,attention_mask,
+                                              thres_mode="high",mean_mode="image")
         else:raise RuntimeError("Bad variant")
         return result.transpose(1,2).contiguous(),None
 
@@ -98,7 +102,7 @@ def main():
     p=argparse.ArgumentParser()
     p.add_argument("--model-dir",type=Path,default=DEFAULT_MODEL)
     p.add_argument("--layer",type=int,default=8)
-    p.add_argument("--candidate",choices=["triton","gemmall","hybrid"],default="triton")
+    p.add_argument("--candidate",choices=["triton","gemmall","hybrid","direct"],default="triton")
     p.add_argument("--baseline",choices=["dense","flash_cmve"],default="dense")
     p.add_argument("--output",type=Path,
                    default=Path.home()/".cache"/"flashcf_results"/"p1_full_model_layer_v2_local.json")
