@@ -8,6 +8,7 @@ not the original verl/CFPO multi-layer RL model or a training result.
 import argparse
 import json
 import os
+import sys
 from pathlib import Path
 
 import torch
@@ -15,6 +16,8 @@ from PIL import Image, ImageDraw
 from transformers import AutoProcessor, Qwen2_5_VLForConditionalGeneration
 import transformers.models.qwen2_5_vl.modeling_qwen2_5_vl as modeling
 
+ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT))
 from experiments.p0_capture_native_qwen import DEFAULT_MODEL, REV, spans_from_ids
 from tools.p0_official_cmve_oracle import load_official_cmve, UPSTREAM_COMMIT
 
