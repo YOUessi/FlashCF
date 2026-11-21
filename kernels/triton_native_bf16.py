@@ -344,7 +344,7 @@ def _check(q,k,v,mask,spans,mean_mode,mode,block):
 @torch.no_grad()
 def forward_native(q,k,v,spans,mask,*,thres_mode="high",
                    mean_mode="image",block_k=32,return_internal=False,
-                   row_tile=0,key_tile=64):
+                   row_tile=0,key_tile=64,delta_only=False):
     """GQA/4D-mask forward. Returns same dtype as input Q, never repeats KV."""
     B,Hq,Hkv,L,D,flat=_check(q,k,v,mask,spans,mean_mode,thres_mode,block_k)
     ratio=Hq//Hkv
@@ -352,18 +352,34 @@ def forward_native(q,k,v,spans,mask,*,thres_mode="high",
     bf16=q.dtype==torch.bfloat16
     bd=triton.next_power_of_2(D)
     LSE=torch.empty((B,Hq,L),device=q.device,dtype=torch.float32)
-    base=torch.empty((B,Hq,L,D),device=q.device,dtype=q.dtype)
-    if row_tile:
-        if not bf16:
-            raise ValueError("Tensor Core row-tiled factual path requires BF16")
-        from kernels.triton_native_tile import tiled_factual
-        base,LSE=tiled_factual(q,k,v,mask,row_tile=row_tile,key_tile=key_tile)
+    if delta_only:
+        # Compute only the statistics needed for CMVE; the factual branch
+        # will be evaluated by the original FlashAttention backend.
+        base=None
+        if row_tile:
+            if not bf16:raise ValueError("Tensor Core CMVE requires BF16")
+            from kernels.triton_native_tile import _tile_lse
+            mtiles=(triton.cdiv(L,row_tile),B*Hq)
+            _tile_lse[mtiles](q,k,mask,LSE,L,D,Hq,Hkv,mask.shape[1],ratio,
+                              1/math.sqrt(D),row_tile,key_tile,bd,num_warps=4)
+        else:
+            _get_lse[(L,B*Hq)](q,k,mask,LSE,L,D,Hq,Hkv,mask.shape[1],ratio,
+                               1/math.sqrt(D),bf16,block_k,bd,num_warps=4)
     else:
-        _get_lse[(L,B*Hq)](q,k,mask,LSE,L,D,Hq,Hkv,mask.shape[1],ratio,
-                            1/math.sqrt(D),bf16,block_k,bd,num_warps=4)
-        _get_base[(L,B*Hq)](q,k,v,mask,LSE,base,L,D,Hq,Hkv,mask.shape[1],
-                            ratio,1/math.sqrt(D),bf16,block_k,bd,num_warps=4)
+        base=torch.empty((B,Hq,L,D),device=q.device,dtype=q.dtype)
+        if row_tile:
+            if not bf16:
+                raise ValueError("Tensor Core row-tiled factual path requires BF16")
+            from kernels.triton_native_tile import tiled_factual
+            base,LSE=tiled_factual(q,k,v,mask,row_tile=row_tile,key_tile=key_tile)
+        else:
+            _get_lse[(L,B*Hq)](q,k,mask,LSE,L,D,Hq,Hkv,mask.shape[1],ratio,
+                                1/math.sqrt(D),bf16,block_k,bd,num_warps=4)
+            _get_base[(L,B*Hq)](q,k,v,mask,LSE,base,L,D,Hq,Hkv,mask.shape[1],
+                                ratio,1/math.sqrt(D),bf16,block_k,bd,num_warps=4)
     if not S:
+        if delta_only:
+            base=torch.zeros((B,Hq,L,D),device=q.device,dtype=q.dtype)
         if return_internal:
             return base,dict(lse=LSE,packed=torch.empty((0,3),device=q.device,dtype=torch.int32),
                              thresholds=torch.empty(0,device=q.device,dtype=torch.float32),
@@ -403,7 +419,8 @@ def forward_native(q,k,v,spans,mask,*,thres_mode="high",
     _get_delta[(L,Hq,S)](q,k,v,mask,LSE,packed,thresholds,replacement,delta,
                          L,D,Hq,Hkv,mask.shape[1],ratio,
                          1/math.sqrt(D),bf16,block_k,bd,num_warps=4)
-    y=base.clone()
+    y=(torch.zeros((B,Hq,L,D),device=q.device,dtype=q.dtype)
+       if delta_only else base.clone())
     for si,(b,st,en) in enumerate(flat):
         y[b]=(y[b]+delta[si]).to(y.dtype)
     if return_internal:
