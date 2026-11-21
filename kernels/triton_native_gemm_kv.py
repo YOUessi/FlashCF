@@ -23,7 +23,8 @@ def _gather_grad_kv_gemm(
     Q,K,V,Mask,LSE,SPANS,THRESH,REPL,DY,ROWDOT,DKTMP,DVTMP,GCPART,
     L:tl.constexpr,D:tl.constexpr,HQ:tl.constexpr,HK:tl.constexpr,
     MH:tl.constexpr,GROUP:tl.constexpr,NS:tl.constexpr,
-    SCALE:tl.constexpr,BM:tl.constexpr,BN:tl.constexpr,BD:tl.constexpr):
+    SCALE:tl.constexpr,BM:tl.constexpr,BN:tl.constexpr,BD:tl.constexpr,
+    DELTA_ONLY:tl.constexpr=False):
     tile=tl.program_id(0)
     bh=tl.program_id(1)
     b=bh//HQ
@@ -69,13 +70,19 @@ def _gather_grad_kv_gemm(
                              (kj[None,:]>=first)&(kj[None,:]<last)&
                              (probs.to(tl.float32)>1.e-8)&
                              (probs.to(tl.float32)>cutoff))
-        grad_base=tl.dot(gy,tl.trans(v)).to(tl.bfloat16).to(tl.float32)
         grad_extra=tl.dot(gy,tl.trans(diff)).to(tl.bfloat16).to(tl.float32)
-        grad_prob=(grad_base+tl.where(active,grad_extra,0.)).to(tl.bfloat16).to(tl.float32)
+        if DELTA_ONLY:
+            grad_prob=tl.where(active,grad_extra,0.).to(tl.bfloat16).to(tl.float32)
+        else:
+            grad_base=tl.dot(gy,tl.trans(v)).to(tl.bfloat16).to(tl.float32)
+            grad_prob=(grad_base+tl.where(active,grad_extra,0.)).to(tl.bfloat16).to(tl.float32)
         dlogit=(probs32*(grad_prob-z[:,None])).to(tl.bfloat16).to(tl.float32)
         dx=(dlogit*SCALE).to(tl.bfloat16)
         gk+=tl.dot(tl.trans(dx),q)
-        masked_prob=tl.where(active,0.,probs.to(tl.float32)).to(tl.bfloat16)
+        if DELTA_ONLY:
+            masked_prob=tl.where(active,-probs.to(tl.float32),0.).to(tl.bfloat16)
+        else:
+            masked_prob=tl.where(active,0.,probs.to(tl.float32)).to(tl.bfloat16)
         gv+=tl.dot(tl.trans(masked_prob),gy)
         gc+=tl.sum(tl.where(active,probs.to(tl.float32),0.)*
                     tl.sum(gy.to(tl.float32),1)[:,None],0)
