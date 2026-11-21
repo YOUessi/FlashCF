@@ -82,6 +82,45 @@ intermediate memory; it is NOT ready for claims of training speedup.
 Full verified data and kernel design:
 [P1 Native BF16/GQA/4D Mask](docs/P1_NATIVE_BF16_GQA_MASK.md).
 
+## P3 direct correction-only CMVE (2026-11-21)
+
+**New execution architecture:** preserve the original factual FlashAttention
+kernel, and run one bounded-intermediate Triton kernel graph for the
+CFPO-style CMVE correction (with custom backward). No duplicate full
+factual computation, unlike the previous diagnostic double-run hybrid.
+
+```python
+from kernels.native import flashcf_direct
+
+# Native BF16 pre-rotated Q/K/V, real additive 4D mask,
+# B,Hq,L,D; B,Hkv,L,D; B,1|Hq,L,L.
+output = flashcf_direct(q,k,v,image_spans,attention_mask,
+                        factual_backend="flash_causal")
+```
+
+- **46/46 tests** passed for correction-only operator and earlier kernels.
+- Real pretrained Qwen2.5-VL-3B layers 0 and 8: identical BF16 forward
+  against forced factual Flash+original explicit CMVE for those real QKV,
+  with local Q-gradient difference 0 and native K/V relative differences
+  generally under 0.3%.
+- Frozen 3B model single-layer comparison (layer 0) against the same
+  forced Flash baseline: final logits and Q gradients exactly matched on
+  one synthetic test, K/V relative gradients ~0.269%/0.014%.
+- 36-layer pretrained model **forward and backward call graphs run on Tang**,
+  with full model weights frozen (no full RL training). All-layer gradient
+  deviations still range ~3–8%; **training equivalence not established**.
+- Repeated BF16 synthetic 2048-token full Attention step:
+  ~12.79–12.80ms Direct vs ~16.58–16.59ms forced Flash+explicit CMVE,
+  peak **additional** allocated memory ~106MiB vs ~1100MiB.
+- 512-token Direct remains slower; do not assert universal speedup.
+- **Full official CFPO/verl RL, original FlashAttention2 configuration,
+  and training quality are NOT YET validated.**
+
+Detailed architecture, reproducible metrics, and full-model limitations:
+[P3 Direct Correction Results](docs/P3_DIRECT_CORRECTION_RESULTS.md).
+The P2 all-Triton operator remains an explicit ablation in
+[P2 Tensor Core Results](docs/P2_TENSORCORE_RESULTS.md).
+
 ## Research gates
 
 1. Correctness vs official CFPO, including actual attention masks, image spans, value statistics and gradients.
