@@ -1,0 +1,167 @@
+{
+  "research_phase": "p3_repeated_robust",
+  "source_commit": "4def3b0960fb22b2ec72807c5320541a95f4fb6d",
+  "recorded_on": "2026-11-21",
+  "machine": "Tang RTX 4090 Laptop",
+  "caveats": [
+    "Synthetic or frozen-model probe, not full CFPO RL training",
+    "Only aggregated metrics committed; pretrained weights and QKV fixtures remain local on Tang"
+  ],
+  "metrics": {
+    "repo_sha": "pinned immutable runner",
+    "torch": "2.10.0+cu128",
+    "device": "NVIDIA GeForce RTX 4090 Laptop GPU",
+    "rounds": 3,
+    "steps_per_round": 8,
+    "model_weights_used": false,
+    "baseline": "PyTorch forced SDPBackend.FLASH_ATTENTION causal factual + dense CMVE",
+    "candidate": "flashcf_direct",
+    "disclaimer": "No original CFPO verl RL, no official FlashAttention2 package, synthetic QKV",
+    "results": [
+      {
+        "seed": 20261121,
+        "L": 512,
+        "gpu_before": "NVIDIA GeForce RTX 4090 Laptop GPU, 51, 1950 MHz, 9001 MHz, 644 MiB",
+        "methods": {
+          "flash_cmve": {
+            "n": 24,
+            "p10_ms": 1.14,
+            "p50_ms": 1.1776,
+            "p90_ms": 1.2334,
+            "peak_extra_mib_max": 76.033
+          },
+          "flashcf_direct": {
+            "n": 24,
+            "p10_ms": 1.4172,
+            "p50_ms": 1.4486,
+            "p90_ms": 1.4713,
+            "peak_extra_mib_max": 26.564
+          }
+        },
+        "candidate": "flashcf_direct",
+        "p50_speedup_forced_flash_over_flashcf": 0.8129,
+        "gpu_after": "NVIDIA GeForce RTX 4090 Laptop GPU, 51, 1950 MHz, 9001 MHz, 644 MiB"
+      },
+      {
+        "seed": 20261122,
+        "L": 512,
+        "gpu_before": "NVIDIA GeForce RTX 4090 Laptop GPU, 51, 1950 MHz, 9001 MHz, 644 MiB",
+        "methods": {
+          "flash_cmve": {
+            "n": 24,
+            "p10_ms": 1.0401,
+            "p50_ms": 1.1014,
+            "p90_ms": 1.5574,
+            "peak_extra_mib_max": 76.033
+          },
+          "flashcf_direct": {
+            "n": 24,
+            "p10_ms": 1.3938,
+            "p50_ms": 1.4351,
+            "p90_ms": 1.5589,
+            "peak_extra_mib_max": 26.564
+          }
+        },
+        "candidate": "flashcf_direct",
+        "p50_speedup_forced_flash_over_flashcf": 0.7675,
+        "gpu_after": "NVIDIA GeForce RTX 4090 Laptop GPU, 51, 1950 MHz, 9001 MHz, 644 MiB"
+      },
+      {
+        "seed": 20261121,
+        "L": 1024,
+        "gpu_before": "NVIDIA GeForce RTX 4090 Laptop GPU, 55, 1950 MHz, 9001 MHz, 996 MiB",
+        "methods": {
+          "flash_cmve": {
+            "n": 24,
+            "p10_ms": 4.2268,
+            "p50_ms": 4.2833,
+            "p90_ms": 4.3216,
+            "peak_extra_mib_max": 283.941
+          },
+          "flashcf_direct": {
+            "n": 24,
+            "p10_ms": 3.8095,
+            "p50_ms": 3.828,
+            "p90_ms": 3.8384,
+            "peak_extra_mib_max": 53.127
+          }
+        },
+        "candidate": "flashcf_direct",
+        "p50_speedup_forced_flash_over_flashcf": 1.1189,
+        "gpu_after": "NVIDIA GeForce RTX 4090 Laptop GPU, 55, 1950 MHz, 9001 MHz, 996 MiB"
+      },
+      {
+        "seed": 20261122,
+        "L": 1024,
+        "gpu_before": "NVIDIA GeForce RTX 4090 Laptop GPU, 55, 1950 MHz, 9001 MHz, 996 MiB",
+        "methods": {
+          "flash_cmve": {
+            "n": 24,
+            "p10_ms": 4.1611,
+            "p50_ms": 4.1923,
+            "p90_ms": 4.2454,
+            "peak_extra_mib_max": 283.941
+          },
+          "flashcf_direct": {
+            "n": 24,
+            "p10_ms": 3.4446,
+            "p50_ms": 3.4734,
+            "p90_ms": 3.5078,
+            "peak_extra_mib_max": 53.127
+          }
+        },
+        "candidate": "flashcf_direct",
+        "p50_speedup_forced_flash_over_flashcf": 1.207,
+        "gpu_after": "NVIDIA GeForce RTX 4090 Laptop GPU, 55, 1950 MHz, 9001 MHz, 996 MiB"
+      },
+      {
+        "seed": 20261121,
+        "L": 2048,
+        "gpu_before": "NVIDIA GeForce RTX 4090 Laptop GPU, 59, 1965 MHz, 9001 MHz, 2404 MiB",
+        "methods": {
+          "flash_cmve": {
+            "n": 24,
+            "p10_ms": 16.5428,
+            "p50_ms": 16.5791,
+            "p90_ms": 16.7197,
+            "peak_extra_mib_max": 1100.129
+          },
+          "flashcf_direct": {
+            "n": 24,
+            "p10_ms": 12.3278,
+            "p50_ms": 12.7913,
+            "p90_ms": 13.0913,
+            "peak_extra_mib_max": 106.252
+          }
+        },
+        "candidate": "flashcf_direct",
+        "p50_speedup_forced_flash_over_flashcf": 1.2961,
+        "gpu_after": "NVIDIA GeForce RTX 4090 Laptop GPU, 59, 1965 MHz, 9001 MHz, 2404 MiB"
+      },
+      {
+        "seed": 20261122,
+        "L": 2048,
+        "gpu_before": "NVIDIA GeForce RTX 4090 Laptop GPU, 58, 2130 MHz, 9001 MHz, 2404 MiB",
+        "methods": {
+          "flash_cmve": {
+            "n": 24,
+            "p10_ms": 16.5595,
+            "p50_ms": 16.5936,
+            "p90_ms": 16.6836,
+            "peak_extra_mib_max": 1100.129
+          },
+          "flashcf_direct": {
+            "n": 24,
+            "p10_ms": 12.0918,
+            "p50_ms": 12.7995,
+            "p90_ms": 12.9999,
+            "peak_extra_mib_max": 106.252
+          }
+        },
+        "candidate": "flashcf_direct",
+        "p50_speedup_forced_flash_over_flashcf": 1.2964,
+        "gpu_after": "NVIDIA GeForce RTX 4090 Laptop GPU, 58, 2130 MHz, 9001 MHz, 2404 MiB"
+      }
+    ]
+  }
+}
