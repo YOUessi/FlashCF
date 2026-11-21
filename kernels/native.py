@@ -16,6 +16,7 @@ from __future__ import annotations
 
 from kernels.triton_native_bf16 import forward_native
 from kernels.triton_native_backward_v2 import flashcf_native_v2
+from kernels.triton_cmve_delta import flashcf_factual_plus_delta
 
 
 def flashcf_native(q,k,v,image_spans,attention_mask,*,thres_mode="high",
@@ -26,4 +27,17 @@ def flashcf_native(q,k,v,image_spans,attention_mask,*,thres_mode="high",
                              block_k=block_k)
 
 
-__all__=["flashcf_native","forward_native"]
+def flashcf_direct(q,k,v,image_spans,attention_mask,*,thres_mode="high",
+                   mean_mode="image",factual_backend="flash_causal",block_k=32,
+                   row_tile=16,key_tile=64):
+    """P3 correction-only experimental API: Flash factual once + Triton CMVE delta.
+
+    No double factual computation, but full 3B CFPO training parity remains unproven.
+    """
+    return flashcf_factual_plus_delta(
+        q,k,v,image_spans,attention_mask,thres_mode=thres_mode,
+        mean_mode=mean_mode,factual_backend=factual_backend,block_k=block_k,
+        row_tile=row_tile,key_tile=key_tile)
+
+
+__all__=["flashcf_native","flashcf_direct","forward_native"]
