@@ -38,8 +38,11 @@ class BetterBF16GradTests(unittest.TestCase):
                        torch.linalg.vector_norm(b.float()).clamp(min=1)).item()
                       for a,b in zip(gd,ref)]
             self.assertTrue(torch.isfinite(t).all())
-            self.assertLess(max(relative),0.06,(name,relative,shape))
+            self.assertLess(max(relative),0.01 if name=="v2" else 0.06,
+                            (name,relative,shape))
             diffs[name]=relative
+        self.assertLess(diffs["v2"][0],diffs["v1"][0]*0.5+1.e-4,
+                        "V2 must improve the BF16 Q-gradient VJP")
         print(f"GRAD_BF16_V1_V2 {shape=} {mode=} {diffs=}",flush=True)
 
     def test_bf16_four_heads(self):
