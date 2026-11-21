@@ -1,0 +1,32 @@
+# Python and tooling
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+build/
+dist/
+*.egg-info/
+
+# Local GPU tests, activations, model checkpoints
+flashcf_fixtures/
+fixtures/
+*.safetensors
+*.pt
+*.pth
+*.ckpt
+checkpoints/
+models/
+outputs/
+runs/
+wandb/
+swanlab/
+.env
+.env.*
+
+# Keep run summaries only if reviewed and anonymized
+experiments/results/*.pt
+experiments/results/*.jsonl
+.DS_Store
