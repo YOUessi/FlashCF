@@ -17,7 +17,8 @@ import torch
 import torch.nn.functional as F
 
 
-def native_sdpa_cmve(q,k,v,spans,mask,*,thres_mode="high",mean_mode="image"):
+def native_sdpa_cmve(q,k,v,spans,mask,*,thres_mode="high",mean_mode="image",
+                     factual_backend="auto"):
     B,Hq,L,D=q.shape
     Hkv=k.shape[1]
     assert q.dtype==k.dtype==v.dtype
@@ -25,8 +26,23 @@ def native_sdpa_cmve(q,k,v,spans,mask,*,thres_mode="high",mean_mode="image"):
         raise ValueError("native GQA and 4D additive mask required")
     kr=k.repeat_interleave(Hq//Hkv,dim=1)
     vr=v.repeat_interleave(Hq//Hkv,dim=1)
-    normal=F.scaled_dot_product_attention(q,kr,vr,attn_mask=mask,
-                                           dropout_p=0.,is_causal=False)
+    if factual_backend=="auto":
+        normal=F.scaled_dot_product_attention(q,kr,vr,attn_mask=mask,
+                                              dropout_p=0.,is_causal=False)
+    elif factual_backend=="flash_causal":
+        # The original CFPO calls FlashAttention as a SEPARATE factual path.
+        # This branch forces PyTorch CUDA FlashAttention for strictly causal
+        # unpadded prefill. It is NOT applicable to arbitrary additive masks.
+        expected=torch.ones((L,L),device=q.device,dtype=torch.bool).tril()
+        allowed=mask>-1.e4
+        if not bool((allowed==expected[None,None,:,:]).all()):
+            raise ValueError("flash_causal requires an exactly causal unpadded 4D mask")
+        from torch.nn.attention import sdpa_kernel, SDPBackend
+        with sdpa_kernel(backends=[SDPBackend.FLASH_ATTENTION]):
+            normal=F.scaled_dot_product_attention(q,kr,vr,attn_mask=None,
+                                                 dropout_p=0.,is_causal=True)
+    else:
+        raise ValueError("factual_backend must be auto or flash_causal")
     # The next ops mirror the original CMVE branch, not the optimized kernel.
     scores=(q@kr.transpose(-1,-2))/math.sqrt(D)
     scores=scores+mask
