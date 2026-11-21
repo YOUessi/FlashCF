@@ -51,7 +51,7 @@ def make_input(processor,config):
 def forward_with_patch(model,x,spans,layer,variant):
     original=model_native.eager_attention_forward
     captures=[]
-    def wrapper(module,q,k,v,mask,**kwargs):
+    def wrapper(module,q,k,v,mask=None,**kwargs):
         if int(getattr(module,"layer_idx",-1))!=layer:
             return original(module,q,k,v,mask,**kwargs)
         if captures:
