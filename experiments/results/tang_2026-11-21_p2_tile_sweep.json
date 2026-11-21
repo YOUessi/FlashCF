@@ -1,0 +1,314 @@
+{
+  "research_phase": "p2_tile_sweep",
+  "source_commit": "1a9694d52d21d924994757ce7d9779914e1924ad",
+  "recorded_on": "2026-11-21",
+  "machine": "Tang RTX 4090 Laptop",
+  "caveats": [
+    "Synthetic or frozen-model probe, not full CFPO RL training",
+    "Only aggregated metrics committed; pretrained weights and QKV fixtures remain local on Tang"
+  ],
+  "metrics": {
+    "source_commit": "immutable snapshot",
+    "device": "NVIDIA GeForce RTX 4090 Laptop GPU",
+    "torch": "2.10.0+cu128",
+    "note": "synthetic BF16, single causal image span, small grid, one Tang GPU; tuning not universally optimal",
+    "results": [
+      {
+        "L": 512,
+        "configs": [
+          {
+            "row_tile": 16,
+            "key_tile": 64,
+            "grad_q_tile": 16,
+            "grad_k_tile": 64,
+            "status": "PASS",
+            "median_step_ms": 1.3013,
+            "peak_extra_mib": 19.598,
+            "forward_relative_error": 0.000050355934945400804,
+            "max_grad_relative_error": 0.00283142295666039
+          },
+          {
+            "row_tile": 32,
+            "key_tile": 64,
+            "grad_q_tile": 16,
+            "grad_k_tile": 64,
+            "status": "PASS",
+            "median_step_ms": 1.2831,
+            "peak_extra_mib": 19.598,
+            "forward_relative_error": 0.000050355934945400804,
+            "max_grad_relative_error": 0.00283142295666039
+          },
+          {
+            "row_tile": 16,
+            "key_tile": 128,
+            "grad_q_tile": 16,
+            "grad_k_tile": 64,
+            "status": "FAIL",
+            "error": "OutOfResources: out of resource: shared memory, Required: 147456, Hardware limit: 101376. Reducing block sizes or `num_stages` may help."
+          },
+          {
+            "row_tile": 32,
+            "key_tile": 128,
+            "grad_q_tile": 32,
+            "grad_k_tile": 64,
+            "status": "FAIL",
+            "error": "OutOfResources: out of resource: shared memory, Required: 163840, Hardware limit: 101376. Reducing block sizes or `num_stages` may help."
+          },
+          {
+            "row_tile": 16,
+            "key_tile": 64,
+            "grad_q_tile": 32,
+            "grad_k_tile": 64,
+            "status": "FAIL",
+            "error": "OutOfResources: out of resource: shared memory, Required: 106496, Hardware limit: 101376. Reducing block sizes or `num_stages` may help."
+          },
+          {
+            "row_tile": 16,
+            "key_tile": 64,
+            "grad_q_tile": 16,
+            "grad_k_tile": 128,
+            "status": "FAIL",
+            "error": "OutOfResources: out of resource: shared memory, Required: 172032, Hardware limit: 101376. Reducing block sizes or `num_stages` may help."
+          },
+          {
+            "row_tile": 32,
+            "key_tile": 64,
+            "grad_q_tile": 32,
+            "grad_k_tile": 128,
+            "status": "FAIL",
+            "error": "OutOfResources: out of resource: shared memory, Required: 180224, Hardware limit: 101376. Reducing block sizes or `num_stages` may help."
+          },
+          {
+            "row_tile": 16,
+            "key_tile": 128,
+            "grad_q_tile": 32,
+            "grad_k_tile": 128,
+            "status": "FAIL",
+            "error": "OutOfResources: out of resource: shared memory, Required: 147456, Hardware limit: 101376. Reducing block sizes or `num_stages` may help."
+          },
+          {
+            "row_tile": 32,
+            "key_tile": 32,
+            "grad_q_tile": 32,
+            "grad_k_tile": 32,
+            "status": "PASS",
+            "median_step_ms": 1.3425,
+            "peak_extra_mib": 19.598,
+            "forward_relative_error": 0.000048687281378079206,
+            "max_grad_relative_error": 0.00283065065741539
+          },
+          {
+            "row_tile": 16,
+            "key_tile": 32,
+            "grad_q_tile": 16,
+            "grad_k_tile": 32,
+            "status": "PASS",
+            "median_step_ms": 1.2902,
+            "peak_extra_mib": 19.598,
+            "forward_relative_error": 0.00004774969784193672,
+            "max_grad_relative_error": 0.0028306860476732254
+          },
+          {
+            "row_tile": 32,
+            "key_tile": 64,
+            "grad_q_tile": 16,
+            "grad_k_tile": 128,
+            "status": "FAIL",
+            "error": "OutOfResources: out of resource: shared memory, Required: 172032, Hardware limit: 101376. Reducing block sizes or `num_stages` may help."
+          },
+          {
+            "row_tile": 16,
+            "key_tile": 64,
+            "grad_q_tile": 32,
+            "grad_k_tile": 128,
+            "status": "FAIL",
+            "error": "OutOfResources: out of resource: shared memory, Required: 180224, Hardware limit: 101376. Reducing block sizes or `num_stages` may help."
+          }
+        ],
+        "top3": [
+          {
+            "row_tile": 32,
+            "key_tile": 64,
+            "grad_q_tile": 16,
+            "grad_k_tile": 64,
+            "status": "PASS",
+            "median_step_ms": 1.2831,
+            "peak_extra_mib": 19.598,
+            "forward_relative_error": 0.000050355934945400804,
+            "max_grad_relative_error": 0.00283142295666039
+          },
+          {
+            "row_tile": 16,
+            "key_tile": 32,
+            "grad_q_tile": 16,
+            "grad_k_tile": 32,
+            "status": "PASS",
+            "median_step_ms": 1.2902,
+            "peak_extra_mib": 19.598,
+            "forward_relative_error": 0.00004774969784193672,
+            "max_grad_relative_error": 0.0028306860476732254
+          },
+          {
+            "row_tile": 16,
+            "key_tile": 64,
+            "grad_q_tile": 16,
+            "grad_k_tile": 64,
+            "status": "PASS",
+            "median_step_ms": 1.3013,
+            "peak_extra_mib": 19.598,
+            "forward_relative_error": 0.000050355934945400804,
+            "max_grad_relative_error": 0.00283142295666039
+          }
+        ]
+      },
+      {
+        "L": 1024,
+        "configs": [
+          {
+            "row_tile": 16,
+            "key_tile": 64,
+            "grad_q_tile": 16,
+            "grad_k_tile": 64,
+            "status": "PASS",
+            "median_step_ms": 3.8706,
+            "peak_extra_mib": 39.192,
+            "forward_relative_error": 0.00006961052713450044,
+            "max_grad_relative_error": 0.0027642182540148497
+          },
+          {
+            "row_tile": 32,
+            "key_tile": 64,
+            "grad_q_tile": 16,
+            "grad_k_tile": 64,
+            "status": "PASS",
+            "median_step_ms": 3.7233,
+            "peak_extra_mib": 39.192,
+            "forward_relative_error": 0.00006961052713450044,
+            "max_grad_relative_error": 0.0027642182540148497
+          },
+          {
+            "row_tile": 16,
+            "key_tile": 128,
+            "grad_q_tile": 16,
+            "grad_k_tile": 64,
+            "status": "FAIL",
+            "error": "OutOfResources: out of resource: shared memory, Required: 147456, Hardware limit: 101376. Reducing block sizes or `num_stages` may help."
+          },
+          {
+            "row_tile": 32,
+            "key_tile": 128,
+            "grad_q_tile": 32,
+            "grad_k_tile": 64,
+            "status": "FAIL",
+            "error": "OutOfResources: out of resource: shared memory, Required: 163840, Hardware limit: 101376. Reducing block sizes or `num_stages` may help."
+          },
+          {
+            "row_tile": 16,
+            "key_tile": 64,
+            "grad_q_tile": 32,
+            "grad_k_tile": 64,
+            "status": "FAIL",
+            "error": "OutOfResources: out of resource: shared memory, Required: 106496, Hardware limit: 101376. Reducing block sizes or `num_stages` may help."
+          },
+          {
+            "row_tile": 16,
+            "key_tile": 64,
+            "grad_q_tile": 16,
+            "grad_k_tile": 128,
+            "status": "FAIL",
+            "error": "OutOfResources: out of resource: shared memory, Required: 172032, Hardware limit: 101376. Reducing block sizes or `num_stages` may help."
+          },
+          {
+            "row_tile": 32,
+            "key_tile": 64,
+            "grad_q_tile": 32,
+            "grad_k_tile": 128,
+            "status": "FAIL",
+            "error": "OutOfResources: out of resource: shared memory, Required: 180224, Hardware limit: 101376. Reducing block sizes or `num_stages` may help."
+          },
+          {
+            "row_tile": 16,
+            "key_tile": 128,
+            "grad_q_tile": 32,
+            "grad_k_tile": 128,
+            "status": "FAIL",
+            "error": "OutOfResources: out of resource: shared memory, Required: 147456, Hardware limit: 101376. Reducing block sizes or `num_stages` may help."
+          },
+          {
+            "row_tile": 32,
+            "key_tile": 32,
+            "grad_q_tile": 32,
+            "grad_k_tile": 32,
+            "status": "PASS",
+            "median_step_ms": 3.8881,
+            "peak_extra_mib": 39.192,
+            "forward_relative_error": 0.00007549057045252994,
+            "max_grad_relative_error": 0.002763766096904874
+          },
+          {
+            "row_tile": 16,
+            "key_tile": 32,
+            "grad_q_tile": 16,
+            "grad_k_tile": 32,
+            "status": "PASS",
+            "median_step_ms": 3.7284,
+            "peak_extra_mib": 39.192,
+            "forward_relative_error": 0.00007629362517036498,
+            "max_grad_relative_error": 0.002763784723356366
+          },
+          {
+            "row_tile": 32,
+            "key_tile": 64,
+            "grad_q_tile": 16,
+            "grad_k_tile": 128,
+            "status": "FAIL",
+            "error": "OutOfResources: out of resource: shared memory, Required: 172032, Hardware limit: 101376. Reducing block sizes or `num_stages` may help."
+          },
+          {
+            "row_tile": 16,
+            "key_tile": 64,
+            "grad_q_tile": 32,
+            "grad_k_tile": 128,
+            "status": "FAIL",
+            "error": "OutOfResources: out of resource: shared memory, Required: 180224, Hardware limit: 101376. Reducing block sizes or `num_stages` may help."
+          }
+        ],
+        "top3": [
+          {
+            "row_tile": 32,
+            "key_tile": 64,
+            "grad_q_tile": 16,
+            "grad_k_tile": 64,
+            "status": "PASS",
+            "median_step_ms": 3.7233,
+            "peak_extra_mib": 39.192,
+            "forward_relative_error": 0.00006961052713450044,
+            "max_grad_relative_error": 0.0027642182540148497
+          },
+          {
+            "row_tile": 16,
+            "key_tile": 32,
+            "grad_q_tile": 16,
+            "grad_k_tile": 32,
+            "status": "PASS",
+            "median_step_ms": 3.7284,
+            "peak_extra_mib": 39.192,
+            "forward_relative_error": 0.00007629362517036498,
+            "max_grad_relative_error": 0.002763784723356366
+          },
+          {
+            "row_tile": 16,
+            "key_tile": 64,
+            "grad_q_tile": 16,
+            "grad_k_tile": 64,
+            "status": "PASS",
+            "median_step_ms": 3.8706,
+            "peak_extra_mib": 39.192,
+            "forward_relative_error": 0.00006961052713450044,
+            "max_grad_relative_error": 0.0027642182540148497
+          }
+        ]
+      }
+    ]
+  }
+}
