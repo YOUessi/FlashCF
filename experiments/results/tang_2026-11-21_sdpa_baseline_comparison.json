@@ -1,0 +1,80 @@
+{
+  "date": "2026-11-21",
+  "executor": "Tang",
+  "commit": "d1598e79dc382440e3c92e5ec9a3f00897ee8074",
+  "gpu": "RTX 4090 Laptop 16 GB",
+  "environment": "PyTorch 2.10.0+cu128, Triton 3.6.0",
+  "tests": "18/18 passed",
+  "conditions": {
+    "batch": 1,
+    "heads": 4,
+    "head_dim": 64,
+    "dtype": "fp32",
+    "causal": true,
+    "dropout": 0,
+    "image_span": "[L//8,L//2)",
+    "mode": "medium",
+    "mean": "image",
+    "repetitions": 4
+  },
+  "measures": [
+    {
+      "L": 256,
+      "dense_ms": 0.8317,
+      "dense_MiB": 6.41,
+      "sdpa_cmve_ms": 0.8571,
+      "sdpa_cmve_MiB": 5.815,
+      "atomic_ms": 0.8417,
+      "atomic_MiB": 1.512,
+      "gather_ms": 0.6975,
+      "gather_MiB": 1.516,
+      "gather_max_forward_error": 7.15e-7,
+      "gather_max_gradient_error": 0.000003099
+    },
+    {
+      "L": 512,
+      "dense_ms": 0.9695,
+      "dense_MiB": 23.629,
+      "sdpa_cmve_ms": 1.0711,
+      "sdpa_cmve_MiB": 19.753,
+      "atomic_ms": 1.8575,
+      "atomic_MiB": 3.02,
+      "gather_ms": 1.5411,
+      "gather_MiB": 3.027,
+      "gather_max_forward_error": 6.85e-7,
+      "gather_max_gradient_error": 0.000004768
+    },
+    {
+      "L": 1024,
+      "dense_ms": 1.4848,
+      "dense_MiB": 91.257,
+      "sdpa_cmve_ms": 1.7284,
+      "sdpa_cmve_MiB": 74.521,
+      "atomic_ms": 4.0909,
+      "atomic_MiB": 6.036,
+      "gather_ms": 1.7121,
+      "gather_MiB": 6.051,
+      "gather_max_forward_error": 8.34e-7,
+      "gather_max_gradient_error": 0.000006437
+    },
+    {
+      "L": 2048,
+      "dense_ms": 7.6223,
+      "dense_MiB": 357.012,
+      "sdpa_cmve_ms": 6.8557,
+      "sdpa_cmve_MiB": 288.041,
+      "atomic_ms": 14.465,
+      "gather_ms": 5.7914,
+      "gather_MiB": 13.099,
+      "gather_max_forward_error": 7.75e-7,
+      "gather_max_gradient_error": 0.000006676
+    }
+  ],
+  "interpretation": "Gather at L2048 reduces peak-extra GPU memory ~95% vs SDPA+CMVE and is ~1.18x faster in this run; lower L results are mixed. Comparison remains synthetic; PyTorch SDPA backend not yet independently profiler-confirmed.",
+  "caveats": [
+    "single microbenchmark run, n=4 median per length, GPU frequency/thermal noise not controlled",
+    "not official CFPO Qwen2.5-VL training; no BF16/padding/packing/dropout",
+    "sdpa_cmve is surrogate; exact official fused attention behavior may differ",
+    "gradient similarity assumes fixed hard selection mask, as in PyTorch comparator semantics"
+  ]
+}
