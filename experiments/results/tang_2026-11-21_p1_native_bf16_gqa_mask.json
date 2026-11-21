@@ -1,0 +1,678 @@
+{
+  "p1_native_bf16_parity": {
+    "status": "FINISHED",
+    "torch": "2.10.0+cu128",
+    "gpu": "NVIDIA GeForce RTX 4090 Laptop GPU",
+    "real_pretrained_fixture": true,
+    "BF16_operator_compared_to_original": true,
+    "GQA_native_no_repeat_in_Triton": true,
+    "Triton_native_BF16_full_model_training": false,
+    "results": [
+      {
+        "layer": 0,
+        "original_dtype": "torch.bfloat16",
+        "shape_q": [
+          1,
+          16,
+          97,
+          128
+        ],
+        "shape_k_native": [
+          1,
+          2,
+          97,
+          128
+        ],
+        "gqa_group_size": 8,
+        "mask_shape": [
+          1,
+          1,
+          97,
+          97
+        ],
+        "image_spans": [
+          [
+            [
+              15,
+              79
+            ]
+          ]
+        ],
+        "exact_upstream_source_sha": "98ca5a4123be2e85e94855fead46c9a385611136",
+        "dense_vs_original_bf16_max_abs": 0,
+        "original_mask_equal_dense": true,
+        "triton_bf16_max_abs": 0.015625,
+        "triton_bf16_rmse": 0.0000825183087727055,
+        "triton_bf16_relative_l2": 0.00042034548823721707,
+        "triton_grad_q_max_abs": 0.18115234375,
+        "triton_grad_k_native_max_abs": 0.03515625,
+        "triton_grad_v_native_max_abs": 0.0625,
+        "finite": true,
+        "pass_forward_relative_l2_under_2pct": true,
+        "pass_gradient_max_abs_under_0_5": true
+      },
+      {
+        "layer": 8,
+        "original_dtype": "torch.bfloat16",
+        "shape_q": [
+          1,
+          16,
+          97,
+          128
+        ],
+        "shape_k_native": [
+          1,
+          2,
+          97,
+          128
+        ],
+        "gqa_group_size": 8,
+        "mask_shape": [
+          1,
+          1,
+          97,
+          97
+        ],
+        "image_spans": [
+          [
+            [
+              15,
+              79
+            ]
+          ]
+        ],
+        "exact_upstream_source_sha": "98ca5a4123be2e85e94855fead46c9a385611136",
+        "dense_vs_original_bf16_max_abs": 0,
+        "original_mask_equal_dense": true,
+        "triton_bf16_max_abs": 0.00006103515625,
+        "triton_bf16_rmse": 1.3700649503789464e-7,
+        "triton_bf16_relative_l2": 9.066916959454829e-7,
+        "triton_grad_q_max_abs": 0.01806640625,
+        "triton_grad_k_native_max_abs": 0.125,
+        "triton_grad_v_native_max_abs": 0.25,
+        "finite": true,
+        "pass_forward_relative_l2_under_2pct": true,
+        "pass_gradient_max_abs_under_0_5": true
+      }
+    ]
+  },
+  "p1_real_gate_diag": [
+    {
+      "layer": 0,
+      "shape": [
+        1,
+        16,
+        97,
+        128
+      ],
+      "gqa_ratio": 8,
+      "image_spans": [
+        [
+          [
+            15,
+            79
+          ]
+        ]
+      ],
+      "reference_gate_count": 243,
+      "triton_gate_count": 243,
+      "mask_flipped_positions": 0,
+      "mask_flip_fraction": 0,
+      "original_threshold": 0.0048828125,
+      "triton_threshold": 0.0048828125,
+      "output": {
+        "max_abs": 0.015625,
+        "rel_l2": 0.00042034548823721707
+      },
+      "gradients": {
+        "q": {
+          "max_abs": 0.18115234375,
+          "rel_l2": 0.07577663660049438
+        },
+        "k_native": {
+          "max_abs": 0.03515625,
+          "rel_l2": 0.005592795088887215
+        },
+        "v_native": {
+          "max_abs": 0.0625,
+          "rel_l2": 0.002507791854441166
+        }
+      },
+      "gradients_v2": {
+        "q": {
+          "max_abs": 0.01611328125,
+          "rel_l2": 0.0017933521885424852
+        },
+        "k_native": {
+          "max_abs": 0.03125,
+          "rel_l2": 0.0029838450718671083
+        },
+        "v_native": {
+          "max_abs": 0.0625,
+          "rel_l2": 0.002507791854441166
+        }
+      },
+      "output_v2": {
+        "max_abs": 0.015625,
+        "rel_l2": 0.00042034548823721707
+      }
+    },
+    {
+      "layer": 8,
+      "shape": [
+        1,
+        16,
+        97,
+        128
+      ],
+      "gqa_ratio": 8,
+      "image_spans": [
+        [
+          [
+            15,
+            79
+          ]
+        ]
+      ],
+      "reference_gate_count": 206,
+      "triton_gate_count": 206,
+      "mask_flipped_positions": 0,
+      "mask_flip_fraction": 0,
+      "original_threshold": 0.016357421875,
+      "triton_threshold": 0.016357421875,
+      "output": {
+        "max_abs": 0.00006103515625,
+        "rel_l2": 9.066916959454829e-7
+      },
+      "gradients": {
+        "q": {
+          "max_abs": 0.01953125,
+          "rel_l2": 0.004293271340429783
+        },
+        "k_native": {
+          "max_abs": 0.125,
+          "rel_l2": 0.004196156747639179
+        },
+        "v_native": {
+          "max_abs": 0.5,
+          "rel_l2": 0.0030461084097623825
+        }
+      },
+      "gradients_v2": {
+        "q": {
+          "max_abs": 0.0009765625,
+          "rel_l2": 0.00003582013596314937
+        },
+        "k_native": {
+          "max_abs": 0.125,
+          "rel_l2": 0.0029035776387900114
+        },
+        "v_native": {
+          "max_abs": 0.5,
+          "rel_l2": 0.0030461084097623825
+        }
+      },
+      "output_v2": {
+        "max_abs": 0.00006103515625,
+        "rel_l2": 9.066916959454829e-7
+      }
+    }
+  ],
+  "p1_native_stress": {
+    "git_commit": "immutable source snapshot",
+    "torch": "2.10.0+cu128",
+    "gpu": "NVIDIA GeForce RTX 4090 Laptop GPU",
+    "model_weights_used": false,
+    "note": "BF16 and native GQA synthetic CUDA operator benchmark, not CFPO RL.",
+    "results": [
+      {
+        "sequence_length": 97,
+        "Hq": 16,
+        "Hkv": 2,
+        "D": 128,
+        "scenario": "causal",
+        "fp16_or_bf16": "BF16",
+        "precision": "BF16 QKV, FP32 tile reductions",
+        "forward": {
+          "max_abs": 0.001953125,
+          "rmse": 0.000016992851669783704,
+          "rel_l2": 0.000056368025980191305
+        },
+        "gradient": {
+          "q": {
+            "max_abs": 0.015625,
+            "rmse": 0.0009383519063703716,
+            "rel_l2": 0.004195999354124069
+          },
+          "k": {
+            "max_abs": 0.03125,
+            "rmse": 0.002825968200340867,
+            "rel_l2": 0.00441207317635417
+          },
+          "v": {
+            "max_abs": 0.0625,
+            "rmse": 0.0025378509890288115,
+            "rel_l2": 0.0030650640837848186
+          }
+        },
+        "dense_step_ms": 0.9574,
+        "triton_step_ms": 1.0653,
+        "dense_peak_extra_MiB": 4.49,
+        "triton_peak_extra_MiB": 3.711,
+        "triton_vs_dense_speedup": 0.899
+      },
+      {
+        "sequence_length": 97,
+        "Hq": 16,
+        "Hkv": 2,
+        "D": 128,
+        "scenario": "packing",
+        "fp16_or_bf16": "BF16",
+        "precision": "BF16 QKV, FP32 tile reductions",
+        "forward": {
+          "max_abs": 0.006103515625,
+          "rmse": 0.0000635977485217154,
+          "rel_l2": 0.00016602230607531965
+        },
+        "gradient": {
+          "q": {
+            "max_abs": 0.015625,
+            "rmse": 0.001135061727836728,
+            "rel_l2": 0.004191141109913588
+          },
+          "k": {
+            "max_abs": 0.03125,
+            "rmse": 0.0034576065372675657,
+            "rel_l2": 0.004445247817784548
+          },
+          "v": {
+            "max_abs": 0.0625,
+            "rmse": 0.003219790291041136,
+            "rel_l2": 0.002946689259260893
+          }
+        },
+        "dense_step_ms": 0.9839,
+        "triton_step_ms": 1.0617,
+        "dense_peak_extra_MiB": 4.414,
+        "triton_peak_extra_MiB": 3.711,
+        "triton_vs_dense_speedup": 0.927
+      },
+      {
+        "sequence_length": 97,
+        "Hq": 16,
+        "Hkv": 2,
+        "D": 128,
+        "scenario": "padding",
+        "fp16_or_bf16": "BF16",
+        "precision": "BF16 QKV, FP32 tile reductions",
+        "forward": {
+          "max_abs": 0.001953125,
+          "rmse": 0.00001724592220853083,
+          "rel_l2": 0.00005717517706216313
+        },
+        "gradient": {
+          "q": {
+            "max_abs": 0.015625,
+            "rmse": 0.0009413994266651571,
+            "rel_l2": 0.004203068558126688
+          },
+          "k": {
+            "max_abs": 0.03125,
+            "rmse": 0.0028090430423617363,
+            "rel_l2": 0.0043776193633675575
+          },
+          "v": {
+            "max_abs": 0.0625,
+            "rmse": 0.0024606382939964533,
+            "rel_l2": 0.00296961423009634
+          }
+        },
+        "dense_step_ms": 1.0107,
+        "triton_step_ms": 1.0565,
+        "dense_peak_extra_MiB": 4.49,
+        "triton_peak_extra_MiB": 3.711,
+        "triton_vs_dense_speedup": 0.957
+      },
+      {
+        "sequence_length": 256,
+        "Hq": 16,
+        "Hkv": 2,
+        "D": 128,
+        "scenario": "causal",
+        "fp16_or_bf16": "BF16",
+        "precision": "BF16 QKV, FP32 tile reductions",
+        "forward": {
+          "max_abs": 0.001953125,
+          "rmse": 0.0000098559767138795,
+          "rel_l2": 0.000046388038754230365
+        },
+        "gradient": {
+          "q": {
+            "max_abs": 0.015625,
+            "rmse": 0.0006940456223674119,
+            "rel_l2": 0.0041213263757526875
+          },
+          "k": {
+            "max_abs": 0.03125,
+            "rmse": 0.002107754349708557,
+            "rel_l2": 0.004392903298139572
+          },
+          "v": {
+            "max_abs": 0.0625,
+            "rmse": 0.0017387039260938764,
+            "rel_l2": 0.0029230467043817043
+          }
+        },
+        "dense_step_ms": 0.9329,
+        "triton_step_ms": 2.227,
+        "dense_peak_extra_MiB": 19.753,
+        "triton_peak_extra_MiB": 9.785,
+        "triton_vs_dense_speedup": 0.419
+      },
+      {
+        "sequence_length": 256,
+        "Hq": 16,
+        "Hkv": 2,
+        "D": 128,
+        "scenario": "packing",
+        "fp16_or_bf16": "BF16",
+        "precision": "BF16 QKV, FP32 tile reductions",
+        "forward": {
+          "max_abs": 0.00390625,
+          "rmse": 0.000013358943760977127,
+          "rel_l2": 0.0000482902760268189
+        },
+        "gradient": {
+          "q": {
+            "max_abs": 0.015625,
+            "rmse": 0.0008722696220502257,
+            "rel_l2": 0.004125829786062241
+          },
+          "k": {
+            "max_abs": 0.03125,
+            "rmse": 0.00264685763977468,
+            "rel_l2": 0.004442070610821247
+          },
+          "v": {
+            "max_abs": 0.0625,
+            "rmse": 0.0022873198613524437,
+            "rel_l2": 0.0029533663764595985
+          }
+        },
+        "dense_step_ms": 1.1716,
+        "triton_step_ms": 2.4596,
+        "dense_peak_extra_MiB": 19.242,
+        "triton_peak_extra_MiB": 9.785,
+        "triton_vs_dense_speedup": 0.476
+      },
+      {
+        "sequence_length": 256,
+        "Hq": 16,
+        "Hkv": 2,
+        "D": 128,
+        "scenario": "padding",
+        "fp16_or_bf16": "BF16",
+        "precision": "BF16 QKV, FP32 tile reductions",
+        "forward": {
+          "max_abs": 0.001953125,
+          "rmse": 0.000008534016160410829,
+          "rel_l2": 0.00004012550925835967
+        },
+        "gradient": {
+          "q": {
+            "max_abs": 0.015625,
+            "rmse": 0.0006954235723242164,
+            "rel_l2": 0.004124722443521023
+          },
+          "k": {
+            "max_abs": 0.03125,
+            "rmse": 0.002137488918378949,
+            "rel_l2": 0.004450637847185135
+          },
+          "v": {
+            "max_abs": 0.0625,
+            "rmse": 0.0017041516257449985,
+            "rel_l2": 0.0028626276180148125
+          }
+        },
+        "dense_step_ms": 0.9032,
+        "triton_step_ms": 2.2897,
+        "dense_peak_extra_MiB": 19.753,
+        "triton_peak_extra_MiB": 9.785,
+        "triton_vs_dense_speedup": 0.394
+      },
+      {
+        "sequence_length": 512,
+        "Hq": 16,
+        "Hkv": 2,
+        "D": 128,
+        "scenario": "causal",
+        "fp16_or_bf16": "BF16",
+        "precision": "BF16 QKV, FP32 tile reductions",
+        "forward": {
+          "max_abs": 0.001953125,
+          "rmse": 0.000012120774954382796,
+          "rel_l2": 0.00007616258517373353
+        },
+        "gradient": {
+          "q": {
+            "max_abs": 0.015625,
+            "rmse": 0.0005410482408478856,
+            "rel_l2": 0.004109986126422882
+          },
+          "k": {
+            "max_abs": 0.03125,
+            "rmse": 0.0016513931332156062,
+            "rel_l2": 0.004388250410556793
+          },
+          "v": {
+            "max_abs": 0.0625,
+            "rmse": 0.001287233317270875,
+            "rel_l2": 0.0028605314437299967
+          }
+        },
+        "dense_step_ms": 1.0865,
+        "triton_step_ms": 6.8741,
+        "dense_peak_extra_MiB": 72.502,
+        "triton_peak_extra_MiB": 19.566,
+        "triton_vs_dense_speedup": 0.158
+      }
+    ]
+  },
+  "p1_v1_v2_bench": {
+    "machine": "Tang RTX4090 Laptop",
+    "torch": "2.10.0+cu128",
+    "precision": "BF16",
+    "benchmark": "CUDA events, synthetic, no full RL",
+    "results": [
+      {
+        "L": 97,
+        "Hq": 16,
+        "Hkv": 2,
+        "D": 128,
+        "dtype": "BF16",
+        "mask": "4D causal [1,1,L,L]",
+        "image_span": [
+          [
+            12,
+            48
+          ]
+        ],
+        "dense": {
+          "median_full_step_ms": 1.0045,
+          "peak_extra_mib": 4.49,
+          "max_output_abs": 0,
+          "output_rel_l2": 0,
+          "gradient_rel_l2": {
+            "q": 0,
+            "k": 0,
+            "v": 0
+          }
+        },
+        "v1": {
+          "median_full_step_ms": 0.9193,
+          "peak_extra_mib": 3.711,
+          "max_output_abs": 0.001953125,
+          "output_rel_l2": 0.000056368025980191305,
+          "gradient_rel_l2": {
+            "q": 0.004196005407720804,
+            "k": 0.004412077367305756,
+            "v": 0.0030650657135993242
+          }
+        },
+        "v2": {
+          "median_full_step_ms": 1.0281,
+          "peak_extra_mib": 3.717,
+          "max_output_abs": 0.001953125,
+          "output_rel_l2": 0.000056368025980191305,
+          "gradient_rel_l2": {
+            "q": 0.00007472217839676887,
+            "k": 0.002587615977972746,
+            "v": 0.0030650657135993242
+          }
+        }
+      },
+      {
+        "L": 256,
+        "Hq": 16,
+        "Hkv": 2,
+        "D": 128,
+        "dtype": "BF16",
+        "mask": "4D causal [1,1,L,L]",
+        "image_span": [
+          [
+            32,
+            128
+          ]
+        ],
+        "dense": {
+          "median_full_step_ms": 1.266,
+          "peak_extra_mib": 19.753,
+          "max_output_abs": 0,
+          "output_rel_l2": 0,
+          "gradient_rel_l2": {
+            "q": 0,
+            "k": 0,
+            "v": 0
+          }
+        },
+        "v1": {
+          "median_full_step_ms": 2.2989,
+          "peak_extra_mib": 9.785,
+          "max_output_abs": 0.001953125,
+          "output_rel_l2": 0.000046388038754230365,
+          "gradient_rel_l2": {
+            "q": 0.004121324047446251,
+            "k": 0.0043929037638008595,
+            "v": 0.0029230471700429916
+          }
+        },
+        "v2": {
+          "median_full_step_ms": 2.474,
+          "peak_extra_mib": 9.801,
+          "max_output_abs": 0.001953125,
+          "output_rel_l2": 0.000046388038754230365,
+          "gradient_rel_l2": {
+            "q": 0.00004656122109736316,
+            "k": 0.0025878760498017073,
+            "v": 0.0029230471700429916
+          }
+        }
+      },
+      {
+        "L": 512,
+        "Hq": 16,
+        "Hkv": 2,
+        "D": 128,
+        "dtype": "BF16",
+        "mask": "4D causal [1,1,L,L]",
+        "image_span": [
+          [
+            64,
+            256
+          ]
+        ],
+        "dense": {
+          "median_full_step_ms": 1.1018,
+          "peak_extra_mib": 72.502,
+          "max_output_abs": 0,
+          "output_rel_l2": 0,
+          "gradient_rel_l2": {
+            "q": 0,
+            "k": 0,
+            "v": 0
+          }
+        },
+        "v1": {
+          "median_full_step_ms": 6.8864,
+          "peak_extra_mib": 19.566,
+          "max_output_abs": 0.001953125,
+          "output_rel_l2": 0.00007616258517373353,
+          "gradient_rel_l2": {
+            "q": 0.004109987523406744,
+            "k": 0.0043882583267986774,
+            "v": 0.0028605321422219276
+          }
+        },
+        "v2": {
+          "median_full_step_ms": 7.0328,
+          "peak_extra_mib": 19.598,
+          "max_output_abs": 0.001953125,
+          "output_rel_l2": 0.00007616258517373353,
+          "gradient_rel_l2": {
+            "q": 0.00008743202488403767,
+            "k": 0.002594857942312956,
+            "v": 0.0028605321422219276
+          }
+        }
+      }
+    ]
+  },
+  "p1_full_model_layer_v2": {
+    "layer": 8,
+    "model_sha": "66285546d2b821cf421d4f5eb2576359d3770cd3",
+    "image_spans": [
+      [
+        [
+          15,
+          79
+        ]
+      ]
+    ],
+    "sequence_length": 93,
+    "model_weights_frozen": true,
+    "training_full_model": false,
+    "native_gqa": true,
+    "input_dtype": "BF16",
+    "logits_max_abs": 0.25,
+    "logits_rel_l2": 0.0062435888685286045,
+    "model_final_logits_shape": [
+      1,
+      1,
+      151936
+    ],
+    "selected_layer_gradients": {
+      "q": {
+        "max_abs": 0.005126953125,
+        "rel_l2": 0.044366613030433655
+      },
+      "k_native": {
+        "max_abs": 0.015625,
+        "rel_l2": 0.04072382301092148
+      },
+      "v_native": {
+        "max_abs": 0.060546875,
+        "rel_l2": 0.05851958319544792
+      }
+    },
+    "peak_gpu_allocated_gib": 7.394
+  },
+  "verified_from": "Tang RTX4090 Laptop GPU",
+  "caveats": [
+    "Full pretrained model was run with frozen weights, not 3B-parameter training.",
+    "Real Qwen Q/K/V BF16 activation and native 4D mask were captured from the Transformers eager path.",
+    "Original CFPO CMVE hard-gate function and BF16 operator reference validated separately.",
+    "Triton backward uses a fixed hard mask and emulates selected native BF16 casts; not bitwise identical gradients.",
+    "Runtime microbenchmarks are synthetic and compare with PyTorch Dense, not optimized FlashAttention baseline."
+  ]
+}
