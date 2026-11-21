@@ -1,0 +1,89 @@
+{
+  "research_phase": "p3_real_direct_qkv",
+  "source_commit": "df11234562b514382d8521f202037737fccbe7be",
+  "recorded_on": "2026-11-21",
+  "machine": "Tang RTX 4090 Laptop",
+  "caveats": [
+    "Synthetic or frozen-model probe, not full CFPO RL training",
+    "Only aggregated metrics committed; pretrained weights and QKV fixtures remain local on Tang"
+  ],
+  "metrics": {
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "precision": "BF16",
+    "gpu": "NVIDIA GeForce RTX 4090 Laptop GPU",
+    "git_source_commit": "immutable snapshot",
+    "note": "Isolated QKV gradients; no full pretrained model or RL training in this test",
+    "results": [
+      {
+        "layer": 0,
+        "shape": [
+          1,
+          16,
+          97,
+          128
+        ],
+        "native_kv_shape": [
+          1,
+          2,
+          97,
+          128
+        ],
+        "GQA_repeat": 8,
+        "comparison": "Forced Flash factual + original explicit BF16 CMVE",
+        "direct": {
+          "output_max_abs": 0,
+          "output_rel_l2": 0,
+          "grad_rel_l2": {
+            "q": 0,
+            "k": 0.0024978278670459986,
+            "v": 0.00046671886229887605
+          }
+        },
+        "hybrid_diagnostic": {
+          "output_max_abs": 0.00390625,
+          "output_rel_l2": 0.00015341526886913925,
+          "grad_rel_l2": {
+            "q": 0.0094729233533144,
+            "k": 0.003145374357700348,
+            "v": 0.0005849302979186177
+          }
+        }
+      },
+      {
+        "layer": 8,
+        "shape": [
+          1,
+          16,
+          97,
+          128
+        ],
+        "native_kv_shape": [
+          1,
+          2,
+          97,
+          128
+        ],
+        "GQA_repeat": 8,
+        "comparison": "Forced Flash factual + original explicit BF16 CMVE",
+        "direct": {
+          "output_max_abs": 0,
+          "output_rel_l2": 0,
+          "grad_rel_l2": {
+            "q": 0,
+            "k": 0.0025993126910179853,
+            "v": 0.0002459090028423816
+          }
+        },
+        "hybrid_diagnostic": {
+          "output_max_abs": 0.00390625,
+          "output_rel_l2": 0.00025777166592888534,
+          "grad_rel_l2": {
+            "q": 0.0013473364524543285,
+            "k": 0.0031968385446816683,
+            "v": 0.00027037449763156474
+          }
+        }
+      }
+    ]
+  }
+}
