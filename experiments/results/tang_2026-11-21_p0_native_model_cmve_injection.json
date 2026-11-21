@@ -1,0 +1,39 @@
+{
+  "date": "2026-11-21",
+  "machine": "Tang RTX 4090 Laptop 16GB",
+  "source_commit": "83cb32c303b0e6f3b938d846298b54b8087180ef",
+  "status": "ORIGINAL_CMVE_HELPER_IN_NATIVE_QWEN_LAYER_EXECUTED",
+  "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+  "model_sha": "66285546d2b821cf421d4f5eb2576359d3770cd3",
+  "cfpo_source_sha": "98ca5a4123be2e85e94855fead46c9a385611136",
+  "layer": 8,
+  "threshold_mode": "medium",
+  "attention_shape": [
+    1,
+    97
+  ],
+  "image_spans": [
+    [
+      [
+        15,
+        79
+      ]
+    ]
+  ],
+  "injected_attention": {
+    "selected": 380,
+    "total": 150544,
+    "delta_max_abs": 1.8828125,
+    "delta_mean_abs": 0.0038686427287757397
+  },
+  "logit_max_abs_difference": 0.8125,
+  "logit_mean_abs_difference": 0.127336785197258,
+  "native_attention_only": true,
+  "not_original_multi_layer_cfpo_training": true,
+  "notes": [
+    "Original CFPO CMVE helper AST extracted without modifications from git-blob validated pinned source.",
+    "Injected into layer 8 native Transformers 4.57.6 eager backend with pretrained Qwen2.5-VL-3B weights.",
+    "Single forward inference, not official CFPO multi-layer patch, no RL training or model fine-tuning.",
+    "Synthetic geometric image prompt contains only simple colored rectangles; no private data."
+  ]
+}
