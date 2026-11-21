@@ -44,6 +44,8 @@ def main():
     p=argparse.ArgumentParser()
     p.add_argument("--lengths",nargs="+",type=int,default=[128,256,512,1024])
     p.add_argument("--repeat",type=int,default=4)
+    p.add_argument("--allow-numerical-mismatch",action="store_true",
+                   help="benchmark despite known hard-mask boundary flips; label failed strict parity")
     p.add_argument("--output",type=Path,default=None)
     args=p.parse_args()
     rows=[]
@@ -68,10 +70,15 @@ def main():
             grads=torch.autograd.grad((y*weights).sum(),xs)
             ferr=(expected-y).detach().abs().max().item()
             gerr=max((a-b).detach().abs().max().item() for a,b in zip(ge,grads))
-            if ferr>2e-4 or gerr>1e-3:raise AssertionError((name,L,ferr,gerr))
+            strict_pass=(ferr<=2e-4 and gerr<=1e-3)
+            if not strict_pass:
+                if not args.allow_numerical_mismatch:
+                    raise AssertionError((name,L,ferr,gerr))
+                print(f"WARNING: {name} L={L} strict parity FAILED: output={ferr}, gradient={gerr}",flush=True)
             ms,mem=measure(method,xs,weights,spans,args.repeat)
             rec[name]={"median_ms":round(ms,4),"peak_delta_mib":mem,
-                       "max_forward_error":round(ferr,9),"max_grad_error":round(gerr,9)}
+                       "max_forward_error":round(ferr,9),"max_grad_error":round(gerr,9),
+                       "strict_parity_pass":strict_pass}
         print(json.dumps(rec),flush=True)
         rows.append(rec)
     artifact={"git_sha":subprocess.check_output(["git","rev-parse","HEAD"],cwd=ROOT,text=True).strip(),
