@@ -30,6 +30,8 @@ def inspect(L,reps=7,row_tile=16,key_tile=64):
     fn={
       "dense":lambda q,k,v:dense_native_cmve(q,k,v,spans,mask,**opt),
       "sdpa_cmve":lambda q,k,v:native_sdpa_cmve(q,k,v,spans,mask,**opt),
+      "flash_cmve":lambda q,k,v:native_sdpa_cmve(q,k,v,spans,mask,
+                                                  factual_backend="flash_causal",**opt),
       "rowwise":lambda q,k,v:flashcf_native_v2(q,k,v,spans,mask,block_k=32,**opt),
       "tiled":lambda q,k,v:flashcf_tiled(q,k,v,spans,mask,block_k=32,
                                         row_tile=row_tile,key_tile=key_tile,**opt),
@@ -83,6 +85,7 @@ if __name__=="__main__":
     args.output.write_text(json.dumps(payload,indent=2)+"\n")
     print("SUMMARY",json.dumps([{ "L":a["length"],
         "sdpa_cmve_ms":a["sdpa_cmve"]["step_median_ms"],
+        "flash_cmve_ms":a["flash_cmve"]["step_median_ms"],
         "rowwise_ms":a["rowwise"]["step_median_ms"],
         "tiled_ms":a["tiled"]["step_median_ms"],
         "gemmkv_ms":a["gemmkv"]["step_median_ms"],
