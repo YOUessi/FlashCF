@@ -114,3 +114,38 @@ On Tang (only GitHub checkout is modified; no independent source edits):
 
 The above scripts use synthetic data and do not download models.
 
+
+## 4096-token numerical stress and threshold discontinuity
+
+On Tang, with B=1/H=4/D=64, one visual span [512,2048), 12,582,912
+eligible probabilities, both Dense and Triton computed the **same FP32 global
+threshold** (0.000803693663328886), and counts of selected entries agreed
+(1,087,182). Nonetheless, independent tile reduction / softmax rounding
+caused **two different individual hard-mask selections** (fraction 1.589e-7).
+
+The resulting forward max absolute difference is 0.001594312; RMSE is
+7.558e-6; output relative-L2 is 1.129e-4. Max gradient difference is about
+0.002255 under the same deterministic test. In contrast, 2048-token test
+showed ~1e-6-level max error. This is a discontinuity of the hard comparator,
+**not evidence of broadly unstable mean/std estimation** (threshold was equal).
+Do not silently relax the operator's threshold to make the test pass.
+
+The 4096-token benchmark with `--allow-numerical-mismatch` retains an explicit
+`strict_parity_pass=false` label for the Atomic and Gather variants:
+
+| Method | Full forward/backward (ms) | Peak extra (MiB) | Strict max-error parity |
+|---|---:|---:|---|
+| Dense PyTorch reference | 31.14 | 1408.02 | pass |
+| Separate SDPA + Dense CMVE | 25.60 | 1148.02 | pass |
+| Triton row-atomic | 57.96 | 24.13 | **fail** |
+| Triton race-free gather | 28.21 | 24.20 | **fail** |
+
+This data supports a strong *memory scaling* reduction at long length, but
+**does not support an across-the-board runtime speedup** or strict numerical
+equivalence at 4096. Runtime depends on GPU clocks, tile size, mask shapes,
+and the chosen SDPA backend; the reported values are a few warm-up samples.
+
+Source artifacts:
+- [4096 diagnostic](../experiments/results/tang_2026-11-21_4096_threshold_numerics.json)
+- [4096 benchmark](../experiments/results/tang_2026-11-21_4096_disclosed_benchmark.json)
+- [Current short-long baseline](../experiments/results/tang_2026-11-21_sdpa_baseline_comparison.json)
