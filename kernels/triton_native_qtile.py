@@ -21,7 +21,7 @@ def _scores_and_dp(Q,K,V,MASK,LSE,SPANS,THRESH,REPL,DY,
                    b,bh,h,kv,qi,kj,ds,
                    L:tl.constexpr,D:tl.constexpr,MH:tl.constexpr,
                    NS:tl.constexpr,SCALE:tl.constexpr,
-                   BM:tl.constexpr,BK:tl.constexpr):
+                   BM:tl.constexpr,BK:tl.constexpr,DELTA_ONLY:tl.constexpr=False):
     vv=tl.load(V+((kv*L+kj[:,None])*D+ds[None,:]),
                mask=(kj[:,None]<L)&(ds[None,:]<D),other=0)
     gy=tl.load(DY+((bh*L+qi[:,None])*D+ds[None,:]),
@@ -45,9 +45,12 @@ def _scores_and_dp(Q,K,V,MASK,LSE,SPANS,THRESH,REPL,DY,
                          (p>1.e-8)&(p>cutoff))
     c=tl.load(REPL+bh).to(tl.float32)
     diff=(c-vv.to(tl.float32)).to(tl.bfloat16)
-    base=tl.dot(gy,tl.trans(vv)).to(tl.bfloat16).to(tl.float32)
     extra=tl.dot(gy,tl.trans(diff)).to(tl.bfloat16).to(tl.float32)
-    dp=(base+tl.where(chosen,extra,0.)).to(tl.bfloat16).to(tl.float32)
+    if DELTA_ONLY:
+        dp=tl.where(chosen,extra,0.).to(tl.bfloat16).to(tl.float32)
+    else:
+        base=tl.dot(gy,tl.trans(vv)).to(tl.bfloat16).to(tl.float32)
+        dp=(base+tl.where(chosen,extra,0.)).to(tl.bfloat16).to(tl.float32)
     return p32,dp,kk
 
 
@@ -55,7 +58,8 @@ def _scores_and_dp(Q,K,V,MASK,LSE,SPANS,THRESH,REPL,DY,
 def _vjp_tile(Q,K,V,MASK,LSE,SPANS,THRESH,REPL,DY,ROWDOT,
               L:tl.constexpr,D:tl.constexpr,HQ:tl.constexpr,HK:tl.constexpr,
               MH:tl.constexpr,GROUP:tl.constexpr,NS:tl.constexpr,
-              SCALE:tl.constexpr,BM:tl.constexpr,BK:tl.constexpr,BD:tl.constexpr):
+              SCALE:tl.constexpr,BM:tl.constexpr,BK:tl.constexpr,BD:tl.constexpr,
+              DELTA_ONLY:tl.constexpr=False):
     mtile=tl.program_id(0)
     bh=tl.program_id(1)
     b=bh//HQ
@@ -67,7 +71,7 @@ def _vjp_tile(Q,K,V,MASK,LSE,SPANS,THRESH,REPL,DY,ROWDOT,
     for st in range(0,L,BK):
         kj=st+tl.arange(0,BK)
         p32,dp,_=_scores_and_dp(Q,K,V,MASK,LSE,SPANS,THRESH,REPL,DY,
-                                b,bh,h,kv,qi,kj,ds,L,D,MH,NS,SCALE,BM,BK)
+                                b,bh,h,kv,qi,kj,ds,L,D,MH,NS,SCALE,BM,BK,DELTA_ONLY)
         z+=tl.sum(p32*dp,1)
     tl.store(ROWDOT+bh*L+qi,z,mask=qi<L)
 
