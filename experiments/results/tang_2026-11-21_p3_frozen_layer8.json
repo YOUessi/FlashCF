@@ -1,0 +1,51 @@
+{
+  "research_phase": "p3_frozen_layer8",
+  "source_commit": "26b0a938ce02a415a044f24ef5ca3897c2ce88d8",
+  "recorded_on": "2026-11-21",
+  "machine": "Tang RTX 4090 Laptop",
+  "caveats": [
+    "Synthetic or frozen-model probe, not full CFPO RL training",
+    "Only aggregated metrics committed; pretrained weights and QKV fixtures remain local on Tang"
+  ],
+  "metrics": {
+    "layer": 8,
+    "candidate": "direct",
+    "baseline": "flash_cmve",
+    "model_sha": "66285546d2b821cf421d4f5eb2576359d3770cd3",
+    "image_spans": [
+      [
+        [
+          15,
+          79
+        ]
+      ]
+    ],
+    "sequence_length": 93,
+    "model_weights_frozen": true,
+    "training_full_model": false,
+    "native_gqa": true,
+    "input_dtype": "BF16",
+    "logits_max_abs": 0,
+    "logits_rel_l2": 0,
+    "model_final_logits_shape": [
+      1,
+      1,
+      151936
+    ],
+    "selected_layer_gradients": {
+      "q": {
+        "max_abs": 0,
+        "rel_l2": 0
+      },
+      "k_native": {
+        "max_abs": 0.0009765625,
+        "rel_l2": 0.002942470833659172
+      },
+      "v_native": {
+        "max_abs": 0.0006103515625,
+        "rel_l2": 0.0005445976858027279
+      }
+    },
+    "peak_gpu_allocated_gib": 7.395
+  }
+}
