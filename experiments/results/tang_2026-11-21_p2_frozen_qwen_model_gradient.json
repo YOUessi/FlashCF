@@ -1,0 +1,41 @@
+{
+  "layer": 8,
+  "candidate": "gemmall",
+  "model_sha": "66285546d2b821cf421d4f5eb2576359d3770cd3",
+  "image_spans": [
+    [
+      [
+        15,
+        79
+      ]
+    ]
+  ],
+  "sequence_length": 93,
+  "model_weights_frozen": true,
+  "training_full_model": false,
+  "native_gqa": true,
+  "input_dtype": "BF16",
+  "logits_max_abs": 0.25,
+  "logits_rel_l2": 0.007298667915165424,
+  "model_final_logits_shape": [
+    1,
+    1,
+    151936
+  ],
+  "selected_layer_gradients": {
+    "q": {
+      "max_abs": 0.0069122314453125,
+      "rel_l2": 0.04885261878371239
+    },
+    "k_native": {
+      "max_abs": 0.02734375,
+      "rel_l2": 0.045360736548900604
+    },
+    "v_native": {
+      "max_abs": 0.05078125,
+      "rel_l2": 0.05432302504777908
+    }
+  },
+  "peak_gpu_allocated_gib": 7.394,
+  "Tang_source_commit": "604c2d5592dd551c50a42ea6d8c9af2351ff3c06"
+}
