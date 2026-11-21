@@ -88,7 +88,7 @@ def main():
     if not (args.model_dir/"model.safetensors.index.json").is_file():
         raise FileNotFoundError(f"Download first: {args.model_dir}")
     print("LOADING",str(args.model_dir),flush=True)
-    processor=AutoProcessor.from_pretrained(args.model_dir,trust_remote_code=False)
+    processor=AutoProcessor.from_pretrained(args.model_dir,trust_remote_code=False,use_fast=False)
     model=Qwen2_5_VLForConditionalGeneration.from_pretrained(
         args.model_dir,dtype=torch.bfloat16,attn_implementation="eager",
         trust_remote_code=False).eval().to("cuda")
