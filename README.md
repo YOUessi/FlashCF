@@ -58,6 +58,30 @@ end-to-end throughput. Strict 4096-token hard-mask numerical boundary remains.
 Details: [P0 real model report](docs/P0_REAL_MODEL_VALIDATION.md) and
 [raw-free evidence](experiments/results/tang_2026-11-21_p0_real_qwen_cfpo_operator.json).
 
+## P1 native BF16 / GQA / 4D-mask (2026-11-21)
+
+**Implemented and tested on Tang:**
+
+- Native BF16 Q/K/V, with non-expanded grouped KV heads (GQA).
+- True 4D additive attention masks of shape `[B,1|Hq,L,L]`, including
+  causal, padding-key, block-packed segments and finite per-head bias.
+- BF16-aware CMVE statistics and scalar Value replacement.
+- Triton Forward and custom Backward in original native head layouts.
+- Default training candidate: `from kernels.native import flashcf_native`
+  (V2 BF16 pre-softmax VJP). V1 remains an ablation only.
+- **27/27** local tests passed. Original CFPO hard gate vs Triton had **zero**
+  flips on two real pretrained Qwen2.5-VL-3B decoder layer fixtures.
+
+**Important limits:** Native BF16 backward is not bitwise identical to eager
+PyTorch (real QKV local gradient relative errors ~0.003 or better for K/V,
+and 0.0018/0.000036 for Q). In a frozen pretrained *whole-model layer
+injection* gradient deviations can be 4-6%. The current BF16 kernel is
+**slower than the Dense reference at L=256/512** despite lower peak
+intermediate memory; it is NOT ready for claims of training speedup.
+
+Full verified data and kernel design:
+[P1 Native BF16/GQA/4D Mask](docs/P1_NATIVE_BF16_GQA_MASK.md).
+
 ## Research gates
 
 1. Correctness vs official CFPO, including actual attention masks, image spans, value statistics and gradients.
