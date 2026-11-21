@@ -33,3 +33,6 @@ experiments/results/*.jsonl
 
 # Auto-generated local runner output; curated results use dated filenames
 experiments/results/tang_gpu_probe.json
+
+# Raw local GPU run output; only curated reviewed JSON is committed
+experiments/results/*_local.json
