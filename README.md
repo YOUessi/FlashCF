@@ -43,6 +43,21 @@ The GPU probe requires CUDA and Triton and exits with a clear error when unavail
 
 **The value-only correction identity is already in CFPO and is not claimed as a new contribution.** Our intended research contribution is the **IO-aware reduction, correction and backward execution algorithm** and its measured impact on real multimodal RL training.
 
+## P0 real pretrained Qwen2.5-VL validation — 2026-11-21
+
+**Completed on Tang RTX 4090 16GB:** SHA-verified pretrained Qwen2.5-VL-3B
+weights, native BF16 M-RoPE Attention captures (layers 0/8), exact original
+CFPO CMVE function replay, FP32 Triton parity on real QKV, and native Qwen
+layer-8 CMVE intervention with observable model-logit changes. Model
+forward peak allocated memory was **7.131 GiB**. Raw activations remain local.
+
+**Not yet complete:** BF16 Triton kernel, arbitrary padded/packed masks,
+published multi-layer CFPO training, whole-model gradients or optimized
+end-to-end throughput. Strict 4096-token hard-mask numerical boundary remains.
+
+Details: [P0 real model report](docs/P0_REAL_MODEL_VALIDATION.md) and
+[raw-free evidence](experiments/results/tang_2026-11-21_p0_real_qwen_cfpo_operator.json).
+
 ## Research gates
 
 1. Correctness vs official CFPO, including actual attention masks, image spans, value statistics and gradients.
