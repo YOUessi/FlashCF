@@ -30,3 +30,6 @@ swanlab/
 experiments/results/*.pt
 experiments/results/*.jsonl
 .DS_Store
+
+# Auto-generated local runner output; curated results use dated filenames
+experiments/results/tang_gpu_probe.json
