@@ -52,8 +52,8 @@ def run_probe():
     gd = torch.autograd.grad((dense*direction).sum(),(q,k,v),retain_graph=True)
     gt = torch.autograd.grad((tiled*direction).sum(),(q,k,v),retain_graph=True)
     gc = torch.autograd.grad((custom*direction).sum(),(q,k,v))
-    oerr = max(float((dense-x).abs().max()) for x in (tiled,custom))
-    gerr = max(float((a-b).abs().max()) for arr in (gt,gc) for a,b in zip(gd,arr))
+    oerr = max((dense-x).detach().abs().max().item() for x in (tiled,custom))
+    gerr = max((a-b).detach().abs().max().item() for arr in (gt,gc) for a,b in zip(gd,arr))
     if oerr>1e-4 or gerr>2e-4:
         raise AssertionError(f"FlashCF CUDA reference mismatch: output={oerr}, gradient={gerr}")
     device = torch.cuda.get_device_properties(0)
