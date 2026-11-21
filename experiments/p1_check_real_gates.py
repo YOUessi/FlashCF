@@ -11,6 +11,7 @@ import torch
 from reference.native_bf16_gqa import dense_native_cmve
 from kernels.triton_native_debug import diagnostic_triton_gate
 from kernels.triton_native_bf16 import flashcf_native
+from kernels.triton_native_backward_v2 import flashcf_native_v2
 
 
 def run(path):
@@ -32,6 +33,8 @@ def run(path):
     weights=torch.randn(yt.shape,device="cuda",dtype=yt.dtype,generator=generator)
     gref=torch.autograd.grad((yref*weights).sum(),(q,k,v))
     gtr=torch.autograd.grad((yt*weights).sum(),(q,k,v))
+    yv2=flashcf_native_v2(q,k,v,spans,mask,thres_mode="high",mean_mode="image")
+    gv2=torch.autograd.grad((yv2*weights).sum(),(q,k,v))
     def error(a,b):
         a=a.float(); b=b.float()
         d=a-b
@@ -48,7 +51,9 @@ def run(path):
         mask_flip_fraction=gt.float().mean().item(),
         original_threshold=t0,triton_threshold=t1,
         output=error(yt,yref),
-        gradients={name:error(a,b) for name,a,b in zip(("q","k_native","v_native"),gtr,gref)})
+        gradients={name:error(a,b) for name,a,b in zip(("q","k_native","v_native"),gtr,gref)},
+        gradients_v2={name:error(a,b) for name,a,b in zip(("q","k_native","v_native"),gv2,gref)},
+        output_v2=error(yv2,yref))
 
 
 if __name__=="__main__":
