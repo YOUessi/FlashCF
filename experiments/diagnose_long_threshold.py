@@ -56,9 +56,12 @@ def one(L):
       "triton_lse_max_abs":float((lse_dense-lse_t).abs().max()),
       "triton_normalized_prob_max_abs":float((pspan-approximate).abs().max()),
       "flipped_mask_entries":int(flips.sum()),
+      "mask_flip_fraction":float(flips.to(torch.float32).mean()),
       "dense_selected":int(mask_dense.sum()),
       "approx_selected":int(mask_approx.sum()),
       "output_max_abs":float((out-yref).abs().max()),
+      "output_rmse":float(((out-yref)**2).mean().sqrt()),
+      "output_relative_l2":float(torch.linalg.vector_norm(out-yref)/torch.linalg.vector_norm(yref)),
     }
     print(json.dumps(diag),flush=True)
     return diag
