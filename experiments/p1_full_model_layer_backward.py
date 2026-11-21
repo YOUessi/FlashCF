@@ -28,6 +28,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from reference.native_bf16_gqa import dense_native_cmve
 from kernels.native import flashcf_native
+from kernels.triton_native_qtile import flashcf_gemm_all
 from experiments.p0_capture_native_qwen import DEFAULT_MODEL,spans_from_ids,REV
 
 
@@ -66,6 +67,10 @@ def forward_with_patch(model,x,spans,layer,variant):
             result=dense_native_cmve(q,k,v,spans,attention_mask,thres_mode="high",mean_mode="image")
         elif variant=="triton":
             result=flashcf_native(q,k,v,spans,attention_mask,thres_mode="high",mean_mode="image")
+        elif variant=="gemmall":
+            result=flashcf_gemm_all(q,k,v,spans,attention_mask,thres_mode="high",
+                                    mean_mode="image",row_tile=16,key_tile=64,
+                                    grad_q_tile=16,grad_k_tile=64)
         else:raise RuntimeError("Bad variant")
         return result.transpose(1,2).contiguous(),None
 
@@ -84,6 +89,7 @@ def main():
     p=argparse.ArgumentParser()
     p.add_argument("--model-dir",type=Path,default=DEFAULT_MODEL)
     p.add_argument("--layer",type=int,default=8)
+    p.add_argument("--candidate",choices=["triton","gemmall"],default="triton")
     p.add_argument("--output",type=Path,
                    default=Path.home()/".cache"/"flashcf_results"/"p1_full_model_layer_v2_local.json")
     args=p.parse_args()
@@ -97,16 +103,16 @@ def main():
     x,spans=make_input(processor,model.config)
     torch.cuda.reset_peak_memory_stats()
     outputs={}
-    for mode in ("dense","triton"):
+    for mode in ("dense",args.candidate):
         logits,grads,loss=forward_with_patch(model,x,spans,args.layer,mode)
         outputs[mode]=(logits,[g.detach().float() for g in grads])
         print("PASS",mode,"loss",loss,"gpu_peak_gib",
               torch.cuda.max_memory_allocated()/2**30,flush=True)
     d,gd=outputs["dense"]
-    t,gt=outputs["triton"]
+    t,gt=outputs[args.candidate]
     err=t-d
     results={
-        "layer":args.layer,"model_sha":REV,"image_spans":spans,
+        "layer":args.layer,"candidate":args.candidate,"model_sha":REV,"image_spans":spans,
         "sequence_length":int(x["input_ids"].shape[1]),
         "model_weights_frozen":True,
         "training_full_model":False,
