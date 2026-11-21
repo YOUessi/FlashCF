@@ -14,6 +14,7 @@ from kernels.triton_native_backward_v2 import flashcf_native_v2
 from kernels.triton_native_tile import flashcf_tiled
 from kernels.triton_native_gemm_kv import flashcf_gemm_kv
 from kernels.triton_native_qtile import flashcf_gemm_all
+from kernels.triton_cmve_delta import flashcf_factual_plus_delta
 from experiments.benchmark_native_bf16 import measure
 
 
@@ -41,6 +42,10 @@ def inspect(L,reps=7,row_tile=16,key_tile=64):
       "gemmall":lambda q,k,v:flashcf_gemm_all(q,k,v,spans,mask,block_k=32,
                                               row_tile=row_tile,key_tile=key_tile,
                                               grad_q_tile=16,grad_k_tile=64,**opt),
+      "direct":lambda q,k,v:flashcf_factual_plus_delta(q,k,v,spans,mask,block_k=32,
+                                              row_tile=row_tile,key_tile=key_tile,
+                                              grad_q_tile=16,grad_k_tile=64,
+                                              factual_backend="flash_causal",**opt),
     }
     weight=torch.randn_like(xs[0])
     ref=fn["dense"](*xs)
@@ -90,10 +95,13 @@ if __name__=="__main__":
         "tiled_ms":a["tiled"]["step_median_ms"],
         "gemmkv_ms":a["gemmkv"]["step_median_ms"],
         "gemmall_ms":a["gemmall"]["step_median_ms"],
+        "direct_ms":a["direct"]["step_median_ms"],
         "tiled_over_rowwise":round(a["rowwise"]["step_median_ms"]/
                                      a["tiled"]["step_median_ms"],3),
         "gemmkv_over_tiled":round(a["tiled"]["step_median_ms"]/
                                      a["gemmkv"]["step_median_ms"],3),
         "gemmall_over_gemmkv":round(a["gemmkv"]["step_median_ms"]/
-                                       a["gemmall"]["step_median_ms"],3)}
+                                       a["gemmall"]["step_median_ms"],3),
+        "direct_over_flash_cmve":round(a["flash_cmve"]["step_median_ms"]/
+                                       a["direct"]["step_median_ms"],3)}
                                      for a in data]),flush=True)
