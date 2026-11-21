@@ -9,6 +9,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from reference.native_bf16_gqa import dense_native_cmve
+from reference.native_sdpa_cmve import native_sdpa_cmve
 from kernels.triton_native_backward_v2 import flashcf_native_v2
 from kernels.triton_native_tile import flashcf_tiled
 from kernels.triton_native_gemm_kv import flashcf_gemm_kv
@@ -28,6 +29,7 @@ def inspect(L,reps=7,row_tile=16,key_tile=64):
     opt=dict(thres_mode="high",mean_mode="image")
     fn={
       "dense":lambda q,k,v:dense_native_cmve(q,k,v,spans,mask,**opt),
+      "sdpa_cmve":lambda q,k,v:native_sdpa_cmve(q,k,v,spans,mask,**opt),
       "rowwise":lambda q,k,v:flashcf_native_v2(q,k,v,spans,mask,block_k=32,**opt),
       "tiled":lambda q,k,v:flashcf_tiled(q,k,v,spans,mask,block_k=32,
                                         row_tile=row_tile,key_tile=key_tile,**opt),
@@ -80,6 +82,7 @@ if __name__=="__main__":
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps(payload,indent=2)+"\n")
     print("SUMMARY",json.dumps([{ "L":a["length"],
+        "sdpa_cmve_ms":a["sdpa_cmve"]["step_median_ms"],
         "rowwise_ms":a["rowwise"]["step_median_ms"],
         "tiled_ms":a["tiled"]["step_median_ms"],
         "gemmkv_ms":a["gemmkv"]["step_median_ms"],
