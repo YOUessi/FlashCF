@@ -148,7 +148,7 @@ class NativeFlashCFGemmAll(torch.autograd.Function):
         count=selected.sum(-1).clamp(min=1).float()
         gmean=gcpart.sum(-1).view(B,Hkv,group).sum(-1)
         dv=dv+(gmean/(count[:,None]*D))[:,:,None,None]*selected[:,None,:,None]
-        return dq.to(q.dtype),dk.to(k.dtype),dv.to(v.dtype),None,None,None,None,None,None,None,None
+        return dq.to(q.dtype),dk.to(k.dtype),dv.to(v.dtype),None,None,None,None,None,None,None,None,None
 
 
 def flashcf_gemm_all(q,k,v,spans,mask,*,thres_mode="high",mean_mode="image",
