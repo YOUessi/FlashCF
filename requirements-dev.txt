@@ -1,0 +1,4 @@
+# Keep the GPU machine's working torch+CUDA installation; do NOT blindly upgrade it.
+# Install only when missing:
+pytest>=8.0
+# torch, triton are separately supplied by your CUDA/PyTorch environment.
