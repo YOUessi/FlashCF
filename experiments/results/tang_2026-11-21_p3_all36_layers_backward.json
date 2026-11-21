@@ -1,0 +1,50 @@
+{
+  "source_commit": "fbae3a701642dacfa97994fc6bec35c94d1bf5a8",
+  "recorded_on": "2026-11-21",
+  "machine": "Tang RTX 4090 Laptop",
+  "metrics": {
+    "source_commit": "immutable source",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "model_revision": "66285546d2b821cf421d4f5eb2576359d3770cd3",
+    "num_layers": 36,
+    "model_weights_frozen": true,
+    "full_parameter_training": false,
+    "BF16": true,
+    "num_input_tokens": 93,
+    "target_grad_layers": [
+      0,
+      8,
+      35
+    ],
+    "flash_baseline_peak_gpu_gib": 7.5025,
+    "direct_peak_gpu_gib": 7.4557,
+    "flash_baseline_step_ms": 416.0625,
+    "direct_step_ms": 331.7166,
+    "logit_rel_l2": 0.0057774800807237625,
+    "logit_max_abs": 0.25,
+    "scalar_loss_reference": 74.30662536621094,
+    "scalar_loss_direct": 74.06011962890625,
+    "grad_rel_l2": {
+      "0": {
+        "q": 0.06873904168605804,
+        "k": 0.07666477560997009,
+        "v": 0.04559585452079773
+      },
+      "8": {
+        "q": 0.04980434477329254,
+        "k": 0.038120854645967484,
+        "v": 0.06538418680429459
+      },
+      "35": {
+        "q": 0.037252482026815414,
+        "k": 0.0392615906894207,
+        "v": 0.03387569636106491
+      }
+    }
+  },
+  "limitations": [
+    "Single short 93-token synthetic-image sample",
+    "Frozen pretrained Qwen2.5-VL-3B, not original verl CFPO full training",
+    "Only aggregated numerical results are committed"
+  ]
+}
