@@ -1,0 +1,52 @@
+{
+  "date": "2026-11-21",
+  "executor": "Tang",
+  "git_commit": "656085d86baa3908d01c7fcd8e6a6216f92184c4",
+  "test": {
+    "total_pass": 18,
+    "total": 18
+  },
+  "length": 4096,
+  "heads": 4,
+  "head_dim": 64,
+  "batch": 1,
+  "dtype": "FP32",
+  "repeat": 3,
+  "methods": {
+    "dense_reference": {
+      "latency_median_ms": 31.1396,
+      "peak_extra_mib": 1408.021,
+      "strict_parity": true
+    },
+    "sdpa_cmve": {
+      "latency_median_ms": 25.6035,
+      "peak_extra_mib": 1148.017,
+      "forward_max_abs": 0.00000155,
+      "grad_max_abs": 0.000013351,
+      "strict_parity": true
+    },
+    "atomic": {
+      "latency_median_ms": 57.9572,
+      "peak_extra_mib": 24.132,
+      "forward_max_abs": 0.001594312,
+      "grad_max_abs": 0.002254594,
+      "strict_parity": false
+    },
+    "gather": {
+      "latency_median_ms": 28.2071,
+      "peak_extra_mib": 24.195,
+      "forward_max_abs": 0.001594312,
+      "grad_max_abs": 0.002254566,
+      "strict_parity": false
+    }
+  },
+  "note": "The benchmark ran with --allow-numerical-mismatch solely to obtain latency/memory. Both Triton versions fail strict maximal-error parity at L4096; do not treat their output as exactly identical to Dense reference.",
+  "root_cause_evidence": "4096 threshold study finds 2 flipped mask comparisons among 12582912 eligible elements, while global threshold FP32 matches. See tang_2026-11-21_4096_threshold_numerics.json",
+  "limitations": [
+    "Synthetic, small number of repetitions",
+    "PyTorch SDPA backend not independently profiled",
+    "not official CFPO model training",
+    "performance advantage vs sdpa_cmve not shown at L4096",
+    "not BF16 or irregular mask"
+  ]
+}
