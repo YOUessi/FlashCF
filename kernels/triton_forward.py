@@ -136,7 +136,7 @@ def _pack_spans(spans, batch_size, length, device):
 @torch.no_grad()
 def flashcf_forward(q:torch.Tensor,k:torch.Tensor,v:torch.Tensor,spans:Sequence,
                     *,thres_mode="high",mean_mode="image",block_k=32,
-                    return_diagnostics=False):
+                    return_diagnostics=False, return_internal=False):
     """Run true tiled GPU forward with bounded attention intermediates.
 
     Input Q,K,V: contiguous float32 [B,H,L,D], pre-rotated if needed.
@@ -164,7 +164,14 @@ def flashcf_forward(q:torch.Tensor,k:torch.Tensor,v:torch.Tensor,spans:Sequence,
     _base_lse[grid](q,k,v,base,lse,L,D,H,1/math.sqrt(D),block_k,bd,num_warps=4)
 
     if not flat:
-        return (base,{"num_spans":0,"attention_materialized":False}) if return_diagnostics else base
+        if return_diagnostics:
+            meta={"num_spans":0,"attention_materialized":False}
+            if return_internal:
+                meta.update({"_lse":lse, "_packed":torch.zeros((1,3),device=q.device,dtype=torch.int32),
+                             "_thresholds":torch.empty(0,device=q.device),
+                             "_replacement":torch.zeros((B,H),device=q.device)})
+            return base,meta
+        return base
 
     is_image=torch.zeros((B,L),device=q.device,dtype=torch.bool)
     for b,st,en in flat:
@@ -196,7 +203,11 @@ def flashcf_forward(q:torch.Tensor,k:torch.Tensor,v:torch.Tensor,spans:Sequence,
     for si,(b,st,en) in enumerate(flat):
         out[b] += delta[si]
     if return_diagnostics:
-        return out,{"num_spans":S,"attention_materialized":False,
-                    "thresholds":thresholds.detach().clone(),"count":count.detach().clone(),
-                    "intermediate_bytes":lse.numel()*4+part_sum.numel()*12+delta.numel()*4}
+        meta={"num_spans":S,"attention_materialized":False,
+              "thresholds":thresholds.detach().clone(),"count":count.detach().clone(),
+              "intermediate_bytes":lse.numel()*4+part_sum.numel()*12+delta.numel()*4}
+        if return_internal:
+            meta.update({"_lse":lse,"_packed":packed,"_thresholds":thresholds,
+                         "_replacement":replacement})
+        return out,meta
     return out
