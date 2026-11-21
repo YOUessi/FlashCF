@@ -137,7 +137,7 @@ class NativeFlashCFGemmKV(torch.autograd.Function):
         norm=sel.sum(-1).clamp(min=1).to(torch.float32)
         gmean=gcpart.sum(-1).view(B,Hkv,group).sum(-1)
         dv=dv+(gmean/(norm[:,None]*D))[:,:,None,None]*sel[:,None,:,None]
-        return dq.to(q.dtype),dk.to(k.dtype),dv.to(v.dtype),None,None,None,None,None,None,None,None
+        return dq.to(q.dtype),dk.to(k.dtype),dv.to(v.dtype),None,None,None,None,None,None,None,None,None
 
 
 def flashcf_gemm_kv(q,k,v,spans,mask,*,thres_mode="high",mean_mode="image",
