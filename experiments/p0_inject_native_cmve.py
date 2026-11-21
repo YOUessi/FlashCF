@@ -25,10 +25,12 @@ def main():
     p=argparse.ArgumentParser()
     p.add_argument("--model-dir",type=Path,default=DEFAULT_MODEL)
     p.add_argument("--layer",type=int,default=8)
+    p.add_argument("--official-source",type=Path,default=None)
     p.add_argument("--mode",choices=["low","medium","high","extra"],default="medium")
     p.add_argument("--output",type=Path,default=Path.home()/".cache"/"flashcf_results"/"p0_injected_cmve_local.json")
     args=p.parse_args()
     torch.manual_seed(20261121)
+    cfpo=load_official_cmve(source=args.official_source)["values_noise_multiply"]
     processor=AutoProcessor.from_pretrained(args.model_dir,trust_remote_code=False,use_fast=False)
     model=Qwen2_5_VLForConditionalGeneration.from_pretrained(
         args.model_dir,dtype=torch.bfloat16,attn_implementation="eager",
@@ -46,7 +48,6 @@ def main():
     spans=spans_from_ids(batch["input_ids"].cpu(),model.config)
     image_pos=[[{"image_token_start":s,"image_token_end":e} for s,e in ss]
                for ss in spans]
-    cfpo=load_official_cmve()["values_noise_multiply"]
     orig=modeling.eager_attention_forward
     observed=[]
     with torch.inference_mode():
