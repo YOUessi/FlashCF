@@ -65,7 +65,7 @@ def dense_native_cmve(q,k,v,spans,mask,*,thres_mode="high",mean_mode="image",
             threshold=mu+mode_multiplier*sd
             current=(prob_slice>threshold)&eligible
             mask_cmve[b:b+1,:,en:,st:en]=current.to(probs.dtype)
-            threshold_records.append((b,st,en,float(threshold.float()),int(current.sum())))
+            threshold_records.append((b,st,en,float(threshold.detach().float()),int(current.detach().sum())))
     base=probs@vr
     delta=(probs*mask_cmve)@(replace-vr)
     out=base+delta
