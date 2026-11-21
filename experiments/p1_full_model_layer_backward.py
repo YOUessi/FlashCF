@@ -51,9 +51,9 @@ def make_input(processor,config):
 def forward_with_patch(model,x,spans,layer,variant):
     original=model_native.eager_attention_forward
     captures=[]
-    def wrapper(module,q,k,v,mask=None,**kwargs):
+    def wrapper(module,q,k,v,attention_mask=None,**kwargs):
         if int(getattr(module,"layer_idx",-1))!=layer:
-            return original(module,q,k,v,mask,**kwargs)
+            return original(module,q,k,v,attention_mask=attention_mask,**kwargs)
         if captures:
             raise RuntimeError("Target layer unexpectedly called twice")
         # Source model frozen; require gradients only at the selected
@@ -63,9 +63,9 @@ def forward_with_patch(model,x,spans,layer,variant):
         v=v.detach().requires_grad_(True)
         captures.append((q,k,v))
         if variant=="dense":
-            result=dense_native_cmve(q,k,v,spans,mask,thres_mode="high",mean_mode="image")
+            result=dense_native_cmve(q,k,v,spans,attention_mask,thres_mode="high",mean_mode="image")
         elif variant=="triton":
-            result=flashcf_native(q,k,v,spans,mask,thres_mode="high",mean_mode="image")
+            result=flashcf_native(q,k,v,spans,attention_mask,thres_mode="high",mean_mode="image")
         else:raise RuntimeError("Bad variant")
         return result.transpose(1,2).contiguous(),None
 
