@@ -13,4 +13,4 @@ jobs:
         with:
           python-version: '3.10'
       - name: Compile source and tests without GPU dependencies
-        run: python -m compileall -q reference tools tests experiments
+        run: python -m compileall -q reference kernels tools tests experiments
