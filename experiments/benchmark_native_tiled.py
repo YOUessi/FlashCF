@@ -12,6 +12,7 @@ from reference.native_bf16_gqa import dense_native_cmve
 from kernels.triton_native_backward_v2 import flashcf_native_v2
 from kernels.triton_native_tile import flashcf_tiled
 from kernels.triton_native_gemm_kv import flashcf_gemm_kv
+from kernels.triton_native_qtile import flashcf_gemm_all
 from experiments.benchmark_native_bf16 import measure
 
 
@@ -33,6 +34,9 @@ def inspect(L,reps=7,row_tile=16,key_tile=64):
       "gemmkv":lambda q,k,v:flashcf_gemm_kv(q,k,v,spans,mask,block_k=32,
                                             row_tile=row_tile,key_tile=key_tile,
                                             grad_query_tile=16,grad_key_tile=32,**opt),
+      "gemmall":lambda q,k,v:flashcf_gemm_all(q,k,v,spans,mask,block_k=32,
+                                              row_tile=row_tile,key_tile=key_tile,
+                                              grad_q_tile=16,grad_k_tile=64,**opt),
     }
     weight=torch.randn_like(xs[0])
     ref=fn["dense"](*xs)
@@ -79,8 +83,11 @@ if __name__=="__main__":
         "rowwise_ms":a["rowwise"]["step_median_ms"],
         "tiled_ms":a["tiled"]["step_median_ms"],
         "gemmkv_ms":a["gemmkv"]["step_median_ms"],
+        "gemmall_ms":a["gemmall"]["step_median_ms"],
         "tiled_over_rowwise":round(a["rowwise"]["step_median_ms"]/
                                      a["tiled"]["step_median_ms"],3),
         "gemmkv_over_tiled":round(a["tiled"]["step_median_ms"]/
-                                     a["gemmkv"]["step_median_ms"],3)}
+                                     a["gemmkv"]["step_median_ms"],3),
+        "gemmall_over_gemmkv":round(a["gemmkv"]["step_median_ms"]/
+                                       a["gemmall"]["step_median_ms"],3)}
                                      for a in data]),flush=True)
