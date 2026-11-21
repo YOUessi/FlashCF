@@ -1,0 +1,363 @@
+{
+  "git_commit": "unknown",
+  "machine": "NVIDIA GeForce RTX 4090 Laptop GPU",
+  "torch": "2.10.0+cu128",
+  "caveats": [
+    "synthetic BF16, one image span",
+    "dense PyTorch reference not optimized CFPO + FlashAttention",
+    "median of small number of repeats; not full training"
+  ],
+  "results": [
+    {
+      "length": 256,
+      "q_heads": 16,
+      "kv_heads": 2,
+      "head_dim": 128,
+      "dtype": "BF16",
+      "num_intervals": 1,
+      "row_tile": 16,
+      "key_tile": 64,
+      "dense": {
+        "step_median_ms": 0.9175,
+        "extra_peak_mib": 19.753,
+        "output_rel_l2": 0,
+        "output_max_abs": 0,
+        "qkv_grad_relative": [
+          0,
+          0,
+          0
+        ]
+      },
+      "sdpa_cmve": {
+        "step_median_ms": 1.0339,
+        "extra_peak_mib": 22.017,
+        "output_rel_l2": 0.00462228013202548,
+        "output_max_abs": 0.015625,
+        "qkv_grad_relative": [
+          0.005864386912435293,
+          0.006498006638139486,
+          0.005499541759490967
+        ]
+      },
+      "flash_cmve": {
+        "step_median_ms": 1.1703,
+        "extra_peak_mib": 22.018,
+        "output_rel_l2": 0.0046215844340622425,
+        "output_max_abs": 0.015625,
+        "qkv_grad_relative": [
+          0.005574516486376524,
+          0.006234146188944578,
+          0.005499593913555145
+        ]
+      },
+      "rowwise": {
+        "step_median_ms": 2.4716,
+        "extra_peak_mib": 9.801,
+        "output_rel_l2": 0.000046388038754230365,
+        "output_max_abs": 0.001953125,
+        "qkv_grad_relative": [
+          0.00004656122109736316,
+          0.0025878760498017073,
+          0.0029230471700429916
+        ]
+      },
+      "tiled": {
+        "step_median_ms": 2.1011,
+        "extra_peak_mib": 9.801,
+        "output_rel_l2": 0.00003916039349860512,
+        "output_max_abs": 0.001953125,
+        "qkv_grad_relative": [
+          0.00005056249938206747,
+          0.002587968483567238,
+          0.002922935178503394
+        ]
+      },
+      "gemmkv": {
+        "step_median_ms": 1.3732,
+        "extra_peak_mib": 9.801,
+        "output_rel_l2": 0.00003916039349860512,
+        "output_max_abs": 0.001953125,
+        "qkv_grad_relative": [
+          0.00005056249938206747,
+          0.0025891705881804228,
+          0.002922977553680539
+        ]
+      },
+      "gemmall": {
+        "step_median_ms": 0.9394,
+        "extra_peak_mib": 9.801,
+        "output_rel_l2": 0.00003916039349860512,
+        "output_max_abs": 0.001953125,
+        "qkv_grad_relative": [
+          0.00003025725163752213,
+          0.0025889845564961433,
+          0.002922977553680539
+        ]
+      }
+    },
+    {
+      "length": 512,
+      "q_heads": 16,
+      "kv_heads": 2,
+      "head_dim": 128,
+      "dtype": "BF16",
+      "num_intervals": 1,
+      "row_tile": 16,
+      "key_tile": 64,
+      "dense": {
+        "step_median_ms": 0.9697,
+        "extra_peak_mib": 72.627,
+        "output_rel_l2": 0,
+        "output_max_abs": 0,
+        "qkv_grad_relative": [
+          0,
+          0,
+          0
+        ]
+      },
+      "sdpa_cmve": {
+        "step_median_ms": 1.1405,
+        "extra_peak_mib": 76.032,
+        "output_rel_l2": 0.004947352223098278,
+        "output_max_abs": 0.015625,
+        "qkv_grad_relative": [
+          0.006022741086781025,
+          0.0066483342088758945,
+          0.0056194099597632885
+        ]
+      },
+      "flash_cmve": {
+        "step_median_ms": 1.0342,
+        "extra_peak_mib": 76.033,
+        "output_rel_l2": 0.004940015729516745,
+        "output_max_abs": 0.015625,
+        "qkv_grad_relative": [
+          0.005788108799606562,
+          0.006417316384613514,
+          0.00562107702717185
+        ]
+      },
+      "rowwise": {
+        "step_median_ms": 7.6411,
+        "extra_peak_mib": 19.598,
+        "output_rel_l2": 0.00007616258517373353,
+        "output_max_abs": 0.001953125,
+        "qkv_grad_relative": [
+          0.00008743202488403767,
+          0.002594857942312956,
+          0.0028605321422219276
+        ]
+      },
+      "tiled": {
+        "step_median_ms": 5.9853,
+        "extra_peak_mib": 19.598,
+        "output_rel_l2": 0.000055494747357442975,
+        "output_max_abs": 0.001953125,
+        "qkv_grad_relative": [
+          0.0000872939417604357,
+          0.002594797872006893,
+          0.002862415974959731
+        ]
+      },
+      "gemmkv": {
+        "step_median_ms": 3.3167,
+        "extra_peak_mib": 19.598,
+        "output_rel_l2": 0.000055494747357442975,
+        "output_max_abs": 0.001953125,
+        "qkv_grad_relative": [
+          0.0000872939417604357,
+          0.002594991819933057,
+          0.002862039487808943
+        ]
+      },
+      "gemmall": {
+        "step_median_ms": 1.3207,
+        "extra_peak_mib": 19.598,
+        "output_rel_l2": 0.000055494747357442975,
+        "output_max_abs": 0.001953125,
+        "qkv_grad_relative": [
+          0.00006393642979674041,
+          0.0025949927512556314,
+          0.002862039487808943
+        ]
+      }
+    },
+    {
+      "length": 1024,
+      "q_heads": 16,
+      "kv_heads": 2,
+      "head_dim": 128,
+      "dtype": "BF16",
+      "num_intervals": 1,
+      "row_tile": 16,
+      "key_tile": 64,
+      "dense": {
+        "step_median_ms": 4.238,
+        "extra_peak_mib": 277.002,
+        "output_rel_l2": 0,
+        "output_max_abs": 0,
+        "qkv_grad_relative": [
+          0,
+          0,
+          0
+        ]
+      },
+      "sdpa_cmve": {
+        "step_median_ms": 5.0034,
+        "extra_peak_mib": 282.065,
+        "output_rel_l2": 0.004920247010886669,
+        "output_max_abs": 0.015625,
+        "qkv_grad_relative": [
+          0.0061143385246396065,
+          0.006763446610420942,
+          0.0057222116738557816
+        ]
+      },
+      "flash_cmve": {
+        "step_median_ms": 4.182,
+        "extra_peak_mib": 283.066,
+        "output_rel_l2": 0.0049171666614711285,
+        "output_max_abs": 0.015625,
+        "qkv_grad_relative": [
+          0.005839420948177576,
+          0.006477969698607922,
+          0.005721807945519686
+        ]
+      },
+      "rowwise": {
+        "step_median_ms": 29.5537,
+        "extra_peak_mib": 39.192,
+        "output_rel_l2": 0.0001736833219183609,
+        "output_max_abs": 0.0078125,
+        "qkv_grad_relative": [
+          0.0001050850041792728,
+          0.0026544921565800905,
+          0.0028586527332663536
+        ]
+      },
+      "tiled": {
+        "step_median_ms": 23.6666,
+        "extra_peak_mib": 39.192,
+        "output_rel_l2": 0.00016222032718360424,
+        "output_max_abs": 0.0078125,
+        "qkv_grad_relative": [
+          0.00011591833754209802,
+          0.0026492183096706867,
+          0.0028581093065440655
+        ]
+      },
+      "gemmkv": {
+        "step_median_ms": 13.9632,
+        "extra_peak_mib": 39.192,
+        "output_rel_l2": 0.00016222032718360424,
+        "output_max_abs": 0.0078125,
+        "qkv_grad_relative": [
+          0.00011591833754209802,
+          0.002648434368893504,
+          0.00285820453427732
+        ]
+      },
+      "gemmall": {
+        "step_median_ms": 4.0356,
+        "extra_peak_mib": 39.192,
+        "output_rel_l2": 0.00016222032718360424,
+        "output_max_abs": 0.0078125,
+        "qkv_grad_relative": [
+          0.00006405400927178562,
+          0.0026542784180492163,
+          0.00285820453427732
+        ]
+      }
+    },
+    {
+      "length": 2048,
+      "q_heads": 16,
+      "kv_heads": 2,
+      "head_dim": 128,
+      "dtype": "BF16",
+      "num_intervals": 1,
+      "row_tile": 16,
+      "key_tile": 64,
+      "dense": {
+        "step_median_ms": 17.4281,
+        "extra_peak_mib": 1084.003,
+        "output_rel_l2": 0,
+        "output_max_abs": 0,
+        "qkv_grad_relative": [
+          0,
+          0,
+          0
+        ]
+      },
+      "sdpa_cmve": {
+        "step_median_ms": 19.7525,
+        "extra_peak_mib": 1092.128,
+        "output_rel_l2": 0.0051798042841255665,
+        "output_max_abs": 0.015625,
+        "qkv_grad_relative": [
+          0.006273578852415085,
+          0.006847856100648642,
+          0.005851261783391237
+        ]
+      },
+      "flash_cmve": {
+        "step_median_ms": 16.5837,
+        "extra_peak_mib": 1100.129,
+        "output_rel_l2": 0.005177446641027927,
+        "output_max_abs": 0.015625,
+        "qkv_grad_relative": [
+          0.006005606614053249,
+          0.006577965337783098,
+          0.00585087388753891
+        ]
+      },
+      "rowwise": {
+        "step_median_ms": 121.0071,
+        "extra_peak_mib": 78.38,
+        "output_rel_l2": 0.00024313596077263355,
+        "output_max_abs": 0.00732421875,
+        "qkv_grad_relative": [
+          0.00022747801267541945,
+          0.0026240942534059286,
+          0.002768018050119281
+        ]
+      },
+      "tiled": {
+        "step_median_ms": 94.977,
+        "extra_peak_mib": 78.38,
+        "output_rel_l2": 0.00023061245155986398,
+        "output_max_abs": 0.00732421875,
+        "qkv_grad_relative": [
+          0.00022648187587037683,
+          0.0026237245183438063,
+          0.002768733771517873
+        ]
+      },
+      "gemmkv": {
+        "step_median_ms": 54.755,
+        "extra_peak_mib": 78.38,
+        "output_rel_l2": 0.00023061245155986398,
+        "output_max_abs": 0.00732421875,
+        "qkv_grad_relative": [
+          0.00022648187587037683,
+          0.002620535669848323,
+          0.0027610266115516424
+        ]
+      },
+      "gemmall": {
+        "step_median_ms": 13.5389,
+        "extra_peak_mib": 78.38,
+        "output_rel_l2": 0.00023061245155986398,
+        "output_max_abs": 0.00732421875,
+        "qkv_grad_relative": [
+          0.00020304620556998998,
+          0.00261971028521657,
+          0.0027610266115516424
+        ]
+      }
+    }
+  ],
+  "Tang_source_commit": "d0d00ef73640324e534ba4b03fae9701d15dc475",
+  "verified_test_count_at_commit": 41,
+  "forced_flash_disclaimer": "torch.nn.attention.sdpa_kernel(backends=[FLASH_ATTENTION]) on causal factual path, with explicit dense CMVE. Not upstream CFPO's complete verl training pipeline."
+}
