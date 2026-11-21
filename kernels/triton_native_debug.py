@@ -45,9 +45,11 @@ def _write_mask(Q,K,Mask,LSE,SPANS,THRESH,OUT,
 
 @torch.no_grad()
 def diagnostic_triton_gate(q,k,v,spans,mask,*,thres_mode="high",
-                           mean_mode="image",block_k=32):
+                           mean_mode="image",block_k=32,
+                           row_tile=0,key_tile=64):
     y,state=forward_native(q,k,v,spans,mask,thres_mode=thres_mode,
                             mean_mode=mean_mode,block_k=block_k,
+                            row_tile=row_tile,key_tile=key_tile,
                             return_internal=True)
     B,Hq,L,D=q.shape
     Hkv=k.shape[1]
