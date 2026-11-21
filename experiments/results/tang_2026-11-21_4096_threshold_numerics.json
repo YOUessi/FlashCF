@@ -1,0 +1,40 @@
+{
+  "date": "2026-11-21",
+  "git_sha": "ed8201c13f0fe49d720b22ea7537c1ff5e5fdd62",
+  "gpu": "Tang RTX 4090 Laptop",
+  "generator": "experiments/diagnose_long_threshold.py",
+  "conditions": {
+    "L": 4096,
+    "H": 4,
+    "D": 64,
+    "threshold": "mean+sample_std",
+    "span": "[512,2048)",
+    "dtype": "FP32",
+    "causal": true,
+    "softmax_drop": 0
+  },
+  "trace": {
+    "total_eligible_attention_entries": 12582912,
+    "reference_threshold": 0.000803693663328886,
+    "triton_threshold": 0.000803693663328886,
+    "threshold_absolute_difference": 0,
+    "reference_mean": 0.00033869477920234203,
+    "reference_std": 0.00046499891323037446,
+    "max_logsumexp_absolute_difference": 9.5367431640625e-7,
+    "max_probability_absolute_difference": 2.60770320892334e-8,
+    "flipped_mask_entries": 2,
+    "flipped_mask_fraction": 1.5894572413799324e-7,
+    "reference_selected_entries": 1087182,
+    "approximation_selected_entries": 1087182,
+    "output_max_abs": 0.0015943124890327454,
+    "output_rmse": 0.000007558134257124038,
+    "output_relative_l2": 0.00011291675036773086
+  },
+  "interpretation": "Strong evidence of hard-mask numerical discontinuity: two probability comparisons cross a threshold even though global FP32 threshold values coincide. Dense-equivalent exact mask in floating point is not guaranteed by different QK reduction orders.",
+  "caveats": [
+    "Synthetic FP32 tests only",
+    "Apparent mask flips computed with torch dense QK and Triton LSE, not direct capture of Triton internal tile decisions",
+    "No official CFPO mixed-precision or model fixture yet",
+    "Do not solve by silently increasing equality tolerance; preserve original threshold rule"
+  ]
+}
