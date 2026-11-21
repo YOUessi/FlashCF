@@ -1,0 +1,112 @@
+{
+  "repo_commit": null,
+  "gpu": "NVIDIA GeForce RTX 4090 Laptop GPU",
+  "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+  "model_revision": "66285546d2b821cf421d4f5eb2576359d3770cd3",
+  "precision": "BF16",
+  "source": "real pretrained post-MRoPE QKV captured earlier",
+  "note": "single isolated operator; NOT full patched CFPO RL training",
+  "layers": [
+    {
+      "layer": 0,
+      "shape": [
+        1,
+        16,
+        97,
+        128
+      ],
+      "native_kv_shape": [
+        1,
+        2,
+        97,
+        128
+      ],
+      "gqa_ratio": 8,
+      "mask_shape": [
+        1,
+        1,
+        97,
+        97
+      ],
+      "reference_threshold": 0.0048828125,
+      "tensor_core_threshold": 0.0048828125,
+      "reference_gate_count": 243,
+      "tensor_core_gate_count": 243,
+      "mask_flips": 0,
+      "output": {
+        "max_abs": 0.0078125,
+        "rel_l2": 0.00021178567840252072,
+        "rmse": 0.00004157578950980678
+      },
+      "gradients": {
+        "q": {
+          "max_abs": 0.01220703125,
+          "rel_l2": 0.0011213095858693123,
+          "rmse": 0.00009964023774955422
+        },
+        "k": {
+          "max_abs": 0.03125,
+          "rel_l2": 0.0025852855760604143,
+          "rmse": 0.0009345285943709314
+        },
+        "v": {
+          "max_abs": 0.0625,
+          "rel_l2": 0.002474806969985366,
+          "rmse": 0.003861041273921728
+        }
+      },
+      "pass": true
+    },
+    {
+      "layer": 8,
+      "shape": [
+        1,
+        16,
+        97,
+        128
+      ],
+      "native_kv_shape": [
+        1,
+        2,
+        97,
+        128
+      ],
+      "gqa_ratio": 8,
+      "mask_shape": [
+        1,
+        1,
+        97,
+        97
+      ],
+      "reference_threshold": 0.016357421875,
+      "tensor_core_threshold": 0.016357421875,
+      "reference_gate_count": 206,
+      "tensor_core_gate_count": 206,
+      "mask_flips": 0,
+      "output": {
+        "max_abs": 0,
+        "rel_l2": 0,
+        "rmse": 0
+      },
+      "gradients": {
+        "q": {
+          "max_abs": 0.000244140625,
+          "rel_l2": 0.0000069206553234835155,
+          "rmse": 6.778877832402941e-7
+        },
+        "k": {
+          "max_abs": 0.0625,
+          "rel_l2": 0.0027370662428438663,
+          "rmse": 0.0008936048834584653
+        },
+        "v": {
+          "max_abs": 0.25,
+          "rel_l2": 0.002541821915656328,
+          "rmse": 0.005961026065051556
+        }
+      },
+      "pass": true
+    }
+  ],
+  "Tang_source_commit": "10ef3a37ff57ca6cd3f90a93ab51933bb52bcb33"
+}
