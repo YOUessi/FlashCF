@@ -1,0 +1,26 @@
+{
+  "date": "2026-11-21",
+  "runner": "Tang",
+  "commit_tested": "00743d83d73c2fb299bf4dff3a2598f07afb0cca",
+  "operating_system": "Linux Ubuntu 6.8",
+  "gpu": "NVIDIA GeForce RTX 4090 Laptop GPU",
+  "gpu_memory_gib": 15.55,
+  "compute_capability": "8.9",
+  "pytorch": "2.10.0+cu128",
+  "triton": "3.6.0",
+  "validations": {
+    "unittest_count": 4,
+    "unittest_status": "PASS",
+    "triton_vecadd": "PASS",
+    "dense_streaming_custom_forward_and_gradients": "PASS",
+    "forward_max_absolute_error": 3.5762786865234375e-7,
+    "gradient_max_absolute_error": 4.76837158203125e-7
+  },
+  "fixtures": "synthetic, B=1 H=2 L=12 D=8",
+  "caveats": [
+    "no official CFPO model fixture",
+    "not a performance benchmark",
+    "no fused FlashCF CUDA kernel built yet",
+    "single initial run"
+  ]
+}
