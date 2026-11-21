@@ -58,9 +58,9 @@ def forward_with_patch(model,x,spans,layer,variant):
             raise RuntimeError("Target layer unexpectedly called twice")
         # Source model frozen; require gradients only at the selected
         # attention projected Q/K/V to avoid allocating full 3B-model grads.
-        q=q.detach().requires_grad_(True)
-        k=k.detach().requires_grad_(True)
-        v=v.detach().requires_grad_(True)
+        q=q.detach().contiguous().requires_grad_(True)
+        k=k.detach().contiguous().requires_grad_(True)
+        v=v.detach().contiguous().requires_grad_(True)
         captures.append((q,k,v))
         if variant=="dense":
             result=dense_native_cmve(q,k,v,spans,attention_mask,thres_mode="high",mean_mode="image")
