@@ -19,6 +19,7 @@ import torch
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from tools.replay_official_fixture import reference_official_dense
+from tools.p0_official_cmve_oracle import official_dense_cfpo, UPSTREAM_COMMIT, UPSTREAM_BLOB_SHA
 from reference.cfpo_reference import dense_cfpo
 from kernels.triton_backward_gather import flashcf_gather
 
@@ -53,6 +54,12 @@ def run(path,device):
     official_bf16,p,selected_mask=reference_official_dense(
         q,k,v,mask,image_pos,thres_mode="high",mean_mode="image",
         attention_dropout=0,noise=False,sliding_window=None)
+    exact_bf16, exact_normal, exact_mask, _ = official_dense_cfpo(
+        q,k,v,mask,spans,thres_mode="high",mean_mode="image")
+    original_mask_equal = bool(torch.equal(selected_mask,exact_mask))
+    bf16_operator_error=float((official_bf16-exact_bf16).float().abs().max())
+    if not original_mask_equal:
+        raise AssertionError("Independent BF16 mask differs from pinned original CFPO function")
     # The unmodified native eager output has shape [B,L,H,D].
     native=native.transpose(1,2) if native.shape==(B,L,H,D) else native
     native_factual_err=(p@v-native).float().abs().max().item()
@@ -62,7 +69,11 @@ def run(path,device):
         original_dtype=str(q.dtype),native_4d_causal_mask=simple_causal,
         native_factual_vs_independent_bf16_abs=native_factual_err,
         official_bf16_cmve_selection_fraction=float(selected_mask.float().mean()),
-        operator_provenance="CMVE formula from pinned CFPO publication, executed independently using native real pretrained QKV",
+        exact_original_cfpo_mask_equal=original_mask_equal,
+        exact_original_cfpo_bf16_operator_max_abs=bf16_operator_error,
+        original_cfpo_source_commit=UPSTREAM_COMMIT,
+        original_cfpo_source_blob=UPSTREAM_BLOB_SHA,
+        operator_provenance="Unmodified CMVE helper functions AST-loaded from pinned CFPO Git source; native Qwen2.5 weights",
         original_model_cmve_forward_tested=False,
     )
 
@@ -70,7 +81,10 @@ def run(path,device):
         qc,kc,vc=(x.float().detach().requires_grad_(True) for x in (q,k,v))
         weight=torch.randn_like(qc)
         dense=dense_cfpo(qc,kc,vc,spans,thres_mode="high",mean_mode="image")
-        # Flatten float32 canonical output for apples-to-apples with v1 FlashCF.
+        upstream_fp32,_,upstream_mask_fp32,_=official_dense_cfpo(
+            qc,kc,vc,mask.float(),spans,thres_mode="high",mean_mode="image")
+        result["independent_vs_upstream_fp32_max_abs"]=float((dense-upstream_fp32).abs().max())
+        # FP32 is an adapted input path, not a BF16 native-kernel equivalence claim.
         try:
             triton=flashcf_gather(qc,kc,vc,spans,thres_mode="high",
                                   mean_mode="image",block_k=32)
