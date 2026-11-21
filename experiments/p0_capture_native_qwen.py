@@ -6,6 +6,7 @@ states can be evaluated separately against the pinned official CMVE operator.
 """
 import argparse
 import json
+import os
 import subprocess
 from pathlib import Path
 import torch
@@ -107,7 +108,8 @@ def main():
     saved,logits_shape=capture_one(model,inputs,set(args.layers),spans,args.fixture_dir)
     meta=dict(status="REAL_QWEN_PRETRAINED_QKV_CAPTURED",
              model="Qwen/Qwen2.5-VL-3B-Instruct",model_revision=REV,
-             flashcf_sha=subprocess.check_output(["git","rev-parse","HEAD"],cwd=ROOT,text=True).strip(),
+             flashcf_sha=os.environ.get("FLASHCF_SOURCE_COMMIT") or
+                 subprocess.check_output(["git","rev-parse","HEAD"],cwd=ROOT,text=True).strip(),
              torch=torch.__version__,transformers=__import__("transformers").__version__,
              gpu=torch.cuda.get_device_name(0),
              peak_allocated_gib=round(torch.cuda.max_memory_allocated()/2**30,3),
