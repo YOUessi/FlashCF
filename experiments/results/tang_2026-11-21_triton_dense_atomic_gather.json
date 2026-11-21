@@ -1,0 +1,90 @@
+{
+  "date": "2026-11-21",
+  "device": "Tang",
+  "gpu": "NVIDIA GeForce RTX 4090 Laptop GPU",
+  "torch": "2.10.0+cu128",
+  "triton": "3.6.0",
+  "code_sha": "7b034d34c08c55d8ae7c84b69beac25b4e526746",
+  "shape": {
+    "batch": 1,
+    "heads": 4,
+    "head_dim": 64,
+    "mean_mode": "image",
+    "thres_mode": "medium",
+    "image_span": "[L//8,L//2)"
+  },
+  "measurement": {
+    "unit": "ms and MiB",
+    "type": "forward+backward, CUDA event medians, synthetic FP32, one span",
+    "lengths": [
+      {
+        "L": 128,
+        "repeats": 4,
+        "dense_ms": 1.4674,
+        "dense_extra_MiB": 1.854,
+        "atomic_ms": 0.7731,
+        "atomic_extra_MiB": 0.758,
+        "gather_ms": 0.7561,
+        "gather_extra_MiB": 0.76,
+        "maximum_gather_forward_abs": 6.71e-7,
+        "maximum_gather_gradient_abs": 0.000002861
+      },
+      {
+        "L": 256,
+        "repeats": 4,
+        "dense_ms": 0.9114,
+        "dense_extra_MiB": 6.41,
+        "atomic_ms": 0.9143,
+        "atomic_extra_MiB": 1.512,
+        "gather_ms": 0.7415,
+        "gather_extra_MiB": 1.516,
+        "maximum_gather_forward_abs": 7.15e-7,
+        "maximum_gather_gradient_abs": 0.000003099
+      },
+      {
+        "L": 512,
+        "repeats": 4,
+        "dense_ms": 0.9236,
+        "dense_extra_MiB": 23.629,
+        "atomic_ms": 1.5534,
+        "atomic_extra_MiB": 3.02,
+        "gather_ms": 0.8875,
+        "gather_extra_MiB": 3.027,
+        "maximum_gather_forward_abs": 6.85e-7,
+        "maximum_gather_gradient_abs": 0.000004768
+      },
+      {
+        "L": 1024,
+        "repeats": 4,
+        "dense_ms": 1.4889,
+        "dense_extra_MiB": 91.257,
+        "atomic_ms": 4.0958,
+        "atomic_extra_MiB": 6.036,
+        "gather_ms": 1.707,
+        "gather_extra_MiB": 6.051,
+        "maximum_gather_forward_abs": 8.34e-7,
+        "maximum_gather_gradient_abs": 0.000006437
+      },
+      {
+        "L": 2048,
+        "repeats": 3,
+        "dense_ms": 7.682,
+        "dense_extra_MiB": 355.012,
+        "atomic_ms": 15.4941,
+        "atomic_extra_MiB": 12.068,
+        "gather_ms": 5.2806,
+        "gather_extra_MiB": 12.099,
+        "maximum_gather_forward_abs": 7.75e-7,
+        "maximum_gather_gradient_abs": 0.000006676
+      }
+    ]
+  },
+  "tests": "4/4 CPU + 5/5 Triton Forward + 4/4 Atomic Backward + 4/4 Gather Backward = 17 passed",
+  "caveats": [
+    "PyTorch Dense reference is not a tuned FlashAttention / official CFPO baseline",
+    "GPU test is deterministic causal FP32 with pre-repeated GQA, no padding or dropout",
+    "Timings from small short-lived runs, no cross-run statistical confidence",
+    "No official model QKV fixtures or real multimodal RL training yet",
+    "Gradient masks are hard comparisons; sampled standard deviation semantics used"
+  ]
+}
