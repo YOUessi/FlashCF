@@ -19,6 +19,7 @@ import torch
 
 from reference.native_sdpa_cmve import native_sdpa_cmve
 from kernels.triton_native_qtile import flashcf_gemm_all
+from kernels.triton_cmve_delta import flashcf_factual_plus_delta
 
 
 def gpu_state():
@@ -31,7 +32,7 @@ def gpu_state():
         return "unavailable: "+type(exc).__name__
 
 
-def one(seed,L,rounds,steps):
+def one(seed,L,rounds,steps,candidate="flashcf_gemm_all"):
     torch.manual_seed(seed)
     B,Hq,Hkv,D=1,16,2,128
     q,k,v=[torch.randn((B,h,L,D),device="cuda",dtype=torch.bfloat16,
@@ -42,12 +43,19 @@ def one(seed,L,rounds,steps):
                       torch.finfo(torch.bfloat16).min)
     spans=[[(L//8,L//2)]]
     kw=dict(thres_mode="high",mean_mode="image")
+    variants={
+      "flashcf_gemm_all":lambda:flashcf_gemm_all(q,k,v,spans,mask,
+                       row_tile=16,key_tile=64,grad_q_tile=16,grad_k_tile=64,
+                       block_k=32,**kw),
+      "flashcf_direct":lambda:flashcf_factual_plus_delta(q,k,v,spans,mask,
+                       factual_backend="flash_causal",
+                       row_tile=16,key_tile=64,grad_q_tile=16,grad_k_tile=64,
+                       block_k=32,**kw)
+    }
     methods={
       "flash_cmve":lambda:native_sdpa_cmve(q,k,v,spans,mask,
                        factual_backend="flash_causal",**kw),
-      "flashcf_gemm_all":lambda:flashcf_gemm_all(q,k,v,spans,mask,
-                       row_tile=16,key_tile=64,grad_q_tile=16,grad_k_tile=64,
-                       block_k=32,**kw)
+      candidate:variants[candidate]
     }
     def workload(func):
         y=func()
@@ -60,7 +68,7 @@ def one(seed,L,rounds,steps):
     memory={}
     order_seed=seed%2
     for r in range(rounds):
-        order=["flash_cmve","flashcf_gemm_all"]
+        order=["flash_cmve",candidate]
         if (r+order_seed)%2: order.reverse()
         for name in order:
             torch.cuda.synchronize()
@@ -87,7 +95,8 @@ def one(seed,L,rounds,steps):
             "peak_extra_mib_max":max(memory[name]),
         }
     f=result["methods"]["flash_cmve"]["p50_ms"]
-    t=result["methods"]["flashcf_gemm_all"]["p50_ms"]
+    t=result["methods"][candidate]["p50_ms"]
+    result["candidate"]=candidate
     result["p50_speedup_forced_flash_over_flashcf"]=round(f/t,4)
     result["gpu_after"]=gpu_state()
     print(json.dumps(result),flush=True)
@@ -99,20 +108,21 @@ if __name__=="__main__":
     p.add_argument("--lengths",nargs="+",type=int,default=[512,1024,2048])
     p.add_argument("--seeds",nargs="+",type=int,default=[20261121,20261122,20261123])
     p.add_argument("--rounds",type=int,default=3)
+    p.add_argument("--candidate",choices=["flashcf_gemm_all","flashcf_direct"],default="flashcf_gemm_all")
     p.add_argument("--steps",type=int,default=12)
     p.add_argument("--output",type=Path,
                    default=Path.home()/".cache"/"flashcf_results"/"p2_repeated_flash_benchmark.json")
     args=p.parse_args()
     if not torch.cuda.is_available():
         raise RuntimeError("requires CUDA GPU on Tang")
-    results=[one(seed,L,args.rounds,args.steps) for L in args.lengths for seed in args.seeds]
+    results=[one(seed,L,args.rounds,args.steps,args.candidate) for L in args.lengths for seed in args.seeds]
     payload={
       "repo_sha":os.environ.get("FLASHCF_SOURCE_COMMIT") or "pinned immutable runner",
       "torch":torch.__version__,"device":torch.cuda.get_device_name(0),
       "rounds":args.rounds,"steps_per_round":args.steps,
       "model_weights_used":False,
       "baseline":"PyTorch forced SDPBackend.FLASH_ATTENTION causal factual + dense CMVE",
-      "candidate":"BF16 all-TensorCore tiled FlashCF Q/K/V",
+      "candidate":args.candidate,
       "disclaimer":"No original CFPO verl RL, no official FlashAttention2 package, synthetic QKV",
       "results":results,
     }
