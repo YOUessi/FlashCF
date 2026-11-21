@@ -80,7 +80,8 @@ def _vjp_tile(Q,K,V,MASK,LSE,SPANS,THRESH,REPL,DY,ROWDOT,
 def _grad_q_tile(Q,K,V,MASK,LSE,SPANS,THRESH,REPL,DY,ROWDOT,DQ,
                  L:tl.constexpr,D:tl.constexpr,HQ:tl.constexpr,HK:tl.constexpr,
                  MH:tl.constexpr,GROUP:tl.constexpr,NS:tl.constexpr,
-                 SCALE:tl.constexpr,BM:tl.constexpr,BK:tl.constexpr,BD:tl.constexpr):
+                 SCALE:tl.constexpr,BM:tl.constexpr,BK:tl.constexpr,BD:tl.constexpr,
+                 DELTA_ONLY:tl.constexpr=False):
     mtile=tl.program_id(0)
     bh=tl.program_id(1)
     b=bh//HQ
@@ -93,7 +94,7 @@ def _grad_q_tile(Q,K,V,MASK,LSE,SPANS,THRESH,REPL,DY,ROWDOT,DQ,
     for st in range(0,L,BK):
         kj=st+tl.arange(0,BK)
         p32,dp,kk=_scores_and_dp(Q,K,V,MASK,LSE,SPANS,THRESH,REPL,DY,
-                                 b,bh,h,kv,qi,kj,ds,L,D,MH,NS,SCALE,BM,BK)
+                                 b,bh,h,kv,qi,kj,ds,L,D,MH,NS,SCALE,BM,BK,DELTA_ONLY)
         dscore=(p32*(dp-z[:,None])).to(tl.bfloat16).to(tl.float32)
         dx=(dscore*SCALE).to(tl.bfloat16)
         accum+=tl.dot(dx,kk)
