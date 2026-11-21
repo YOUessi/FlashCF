@@ -13,6 +13,7 @@ import torch
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from reference.cfpo_reference import dense_cfpo
+from reference.cfpo_sdpa_baseline import sdpa_cmve_baseline
 from kernels.triton_backward import flashcf_autograd
 from kernels.triton_backward_gather import flashcf_gather
 
@@ -55,6 +56,7 @@ def main():
         opts={"thres_mode":"medium","mean_mode":"image"}
         methods={
           "dense":lambda *z:dense_cfpo(*z,**opts),
+          "sdpa_cmve":lambda *z:sdpa_cmve_baseline(*z,**opts),
           "atomic":lambda *z:flashcf_autograd(*z,block_k=32,**opts),
           "gather":lambda *z:flashcf_gather(*z,block_k=32,**opts),
         }
@@ -64,8 +66,8 @@ def main():
         for name,method in methods.items():
             y=method(*xs,spans)
             grads=torch.autograd.grad((y*weights).sum(),xs)
-            ferr=float((expected-y).abs().max())
-            gerr=max(float((a-b).abs().max()) for a,b in zip(ge,grads))
+            ferr=(expected-y).detach().abs().max().item()
+            gerr=max((a-b).detach().abs().max().item() for a,b in zip(ge,grads))
             if ferr>2e-4 or gerr>1e-3:raise AssertionError((name,L,ferr,gerr))
             ms,mem=measure(method,xs,weights,spans,args.repeat)
             rec[name]={"median_ms":round(ms,4),"peak_delta_mib":mem,
